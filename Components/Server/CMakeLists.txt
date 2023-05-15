@@ -9,14 +9,17 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS
         Core
         Network
+        Sql
         REQUIRED)
 
-add_executable(Server main.cpp src/Server.cpp)
+add_executable(Server main.cpp src/Server.cpp src/DatabaseController.cpp inc/DatabaseController.h)
 
+include_directories(inc)
 include_directories(../../3rdparty/spdlog/include)
 
 target_link_libraries(Server
         Qt5::Core
         Qt5::Network
+        Qt5::Sql
         )
 

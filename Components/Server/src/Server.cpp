@@ -2,9 +2,11 @@
 // Created by dany on 14.05.23.
 //
 
-#include "../inc/Server.h"
+#include "Server.h"
 
 Server::Server(QObject* parent)
+    :
+    QObject(parent)
 {
     m_server = new QTcpServer(this);
 
@@ -20,11 +22,15 @@ Server::Server(QObject* parent)
     {
         qDebug() << "Server started!";
     }
+
+    m_dbController = new DatabaseController("localhost", 5432, "mydatabase", "myuser", "mypassword");
+    m_dbController->start();
+
 };
 
 Server::~Server()
 {
-
+    m_dbController->stop();
 }
 
 void Server::handleNewConnection()

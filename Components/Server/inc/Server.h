@@ -1,7 +1,3 @@
-//
-// Created by dany on 14.05.23.
-//
-
 #ifndef SERVER_SERVER_H
 #define SERVER_SERVER_H
 
@@ -11,15 +7,15 @@
 #include <memory>
 #include <map>
 
+#include "DatabaseController.h"
+
 class Server : public QObject
 {
-public:
     Q_OBJECT
-
 public:
     Server(QObject* parent = nullptr);
 
-    ~Server();
+    virtual ~Server();
 
 signals:
 
@@ -31,6 +27,7 @@ public:
 
 private:
     QTcpServer* m_server;
+    DatabaseController* m_dbController;
 };
 
 
