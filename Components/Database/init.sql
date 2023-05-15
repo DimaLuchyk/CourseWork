@@ -6,11 +6,11 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Create the "files" table to store file metadata
-CREATE TABLE IF NOT EXISTS files  (
-    file_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+CREATE TABLE IF NOT EXISTS files (
+    file_id UUID PRIMARY KEY,
     filename VARCHAR(255) NOT NULL,
     file_path TEXT NOT NULL,
     user_id INTEGER NOT NULL,
-    upload_date TIMESTAMP NOT NULL,
+    upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
