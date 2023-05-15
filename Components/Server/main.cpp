@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <iostream>
 
-#include "Server.h"
+#include "inc/Server.h"
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"

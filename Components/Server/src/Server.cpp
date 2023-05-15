@@ -2,7 +2,7 @@
 // Created by dany on 14.05.23.
 //
 
-#include "Server.h"
+#include "../inc/Server.h"
 
 Server::Server(QObject* parent)
 {

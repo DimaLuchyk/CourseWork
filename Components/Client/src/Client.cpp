@@ -2,7 +2,7 @@
 // Created by dany on 14.05.23.
 //
 
-#include "Client.h"
+#include "../inc/Client.h"
 
 Client::Client(QObject* parent)
 {

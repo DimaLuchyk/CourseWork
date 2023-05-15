@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QPushButton>
 
-#include "LCClient.h"
+#include "inc/LCClient.h"
 
 int main(int argc, char *argv[]) {
 

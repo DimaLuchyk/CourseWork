@@ -11,7 +11,7 @@ find_package(Qt5 COMPONENTS
         Network
         REQUIRED)
 
-add_executable(Server main.cpp Server.cpp)
+add_executable(Server main.cpp src/Server.cpp)
 
 include_directories(../../3rdparty/spdlog/include)
 

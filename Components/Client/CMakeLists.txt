@@ -14,7 +14,7 @@ find_package(Qt5 COMPONENTS
         Network
         REQUIRED)
 
-add_executable(Client main.cpp Client.cpp LCClient.cpp LCClient.h)
+add_executable(Client main.cpp src/Client.cpp src/LCClient.cpp inc/LCClient.h)
 target_link_libraries(Client
         Qt5::Core
         Qt5::Gui

@@ -2,7 +2,7 @@
 // Created by dany on 14.05.23.
 //
 
-#include "LCClient.h"
+#include "../inc/LCClient.h"
 
 LCClient::LCClient(QObject* parent)
 {
