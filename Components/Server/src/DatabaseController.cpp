@@ -50,8 +50,8 @@ void DatabaseController::addUser(const QUuid& uuid, const QString& userName, con
     }
 
     QSqlQuery query;
-    query.prepare("INSERT INTO users (user_id, username, password) VALUES (:user_id :username, :password)");
-    query.bindValue(":user_id", uuid.toString());
+    query.prepare("INSERT INTO users (user_id, user_name, password) VALUES (:userid :username, :password)");
+    query.bindValue(":userid", uuid.toString());
     query.bindValue(":username", userName);
     query.bindValue(":password", password);
 
@@ -73,11 +73,11 @@ void DatabaseController::addFile(const QUuid& uuid, const QString& fileName, con
     }
 
     QSqlQuery query;
-    query.prepare("INSERT INTO files (file_id, filename, file_path, user_id) VALUES (:file_id, :filename, :file_path, :user_id)");
-    query.bindValue(":file_id", uuid.toString());
+    query.prepare("INSERT INTO files (file_id, file_name, file_path, user_id) VALUES (:fileid, :filename, :filepath, :userid)");
+    query.bindValue(":fileid", uuid.toString());
     query.bindValue(":filename", fileName);
-    query.bindValue(":file_path", filePath);
-    query.bindValue(":user_id", userId);
+    query.bindValue(":filepath", filePath);
+    query.bindValue(":userid", userId);
 
     if (query.exec())
     {
@@ -99,8 +99,39 @@ bool DatabaseController::userExist(const QString& userName, const QString& passw
 
     QSqlQuery query;
     query.prepare("SELECT COUNT(*) FROM users WHERE username = :username AND password = :password");
-    query.bindValue(":username", userName);
+    query.bindValue(":user_name", userName);
     query.bindValue(":password", password);
+
+    if (query.exec() && query.next())
+    {
+        const int count = query.value(0).toInt();
+
+        if (count > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    else
+    {
+        qDebug() << "Failed to execute query:" << query.lastError().text();
+        return false;
+    }
+}
+
+bool DatabaseController::fileExist(const QString& fileName, const QString& filePath, const QString& userId)
+{
+    if(!m_database.isOpen())
+    {
+        qDebug() << "addFile failed to execute. database connection is not opened!\n";
+        return false;
+    }
+
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM files WHERE file_name = :fileName AND file_path = :filePath AND user_id = :userId");
+    query.bindValue(":fileName", fileName);
+    query.bindValue(":filePath", filePath);
+    query.bindValue(":userId", userId);
 
     if (query.exec() && query.next())
     {

@@ -27,6 +27,7 @@ public:
     void addFile(const QUuid& uuid, const QString& fileName, const QString& filePath, const QString& userId);
 
     bool userExist(const QString& userName, const QString& password);
+    bool fileExist(const QString& fileName, const QString& filePath, const QString& userId);
 
 public slots:
 
