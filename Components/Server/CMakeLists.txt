@@ -6,13 +6,15 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-
 find_package(Qt5 COMPONENTS
         Core
         Network
         REQUIRED)
 
 add_executable(Server main.cpp Server.cpp)
+
+include_directories(../../3rdparty/spdlog/include)
+
 target_link_libraries(Server
         Qt5::Core
         Qt5::Network
