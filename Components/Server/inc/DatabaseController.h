@@ -21,6 +21,8 @@ public:
     void start();
     void stop();
 
+    
+
 public slots:
 
 signals:
