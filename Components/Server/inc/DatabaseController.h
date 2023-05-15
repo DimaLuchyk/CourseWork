@@ -6,6 +6,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QUuid>
 
 
 class DatabaseController : public QObject
@@ -18,10 +19,14 @@ public:
     virtual ~DatabaseController();
 
 public:
+
     void start();
     void stop();
 
-    
+    void addUser(const QUuid& uuid, const QString& userName, const QString& password);
+    void addFile(const QUuid& uuid, const QString& fileName, const QString& filePath, const QString& userId);
+
+    bool userExist(const QString& userName, const QString& password);
 
 public slots:
 
