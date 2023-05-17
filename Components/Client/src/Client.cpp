@@ -4,7 +4,11 @@
 
 #include "../inc/Client.h"
 
-Client::Client(QObject* parent)
+Client::Client(const QString& ip, const std::uint16_t port, QObject* parent)
+    :
+    QObject(parent),
+    m_ip(ip),
+    m_port(port)
 {
     std::string str("hello from client");
     QByteArray data = QByteArray::fromStdString(str);
@@ -12,7 +16,7 @@ Client::Client(QObject* parent)
     m_socket = new QTcpSocket( this );
     connect( m_socket, &QTcpSocket::readyRead, this, &Client::readTcpData );
 
-    m_socket->connectToHost("127.0.0.1", 9999);
+    m_socket->connectToHost(m_ip, m_port);
     if( m_socket->waitForConnected() )
     {
         qDebug() << "connected to host\n";

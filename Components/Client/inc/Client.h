@@ -11,10 +11,10 @@
 class Client : public QObject
 {
 public:
-    Q_OBJECT
+    //Q_OBJECT
 
 public:
-    Client(QObject* parent = nullptr);
+    Client(const QString& ip, const std::uint16_t port, QObject* parent = nullptr);
 
     ~Client();
 
@@ -24,6 +24,8 @@ signals:
 
 private:
     QTcpSocket* m_socket;
+    QString m_ip;
+    std::uint16_t m_port;
 };
 
 

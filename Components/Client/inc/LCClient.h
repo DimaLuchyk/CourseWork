@@ -6,6 +6,8 @@
 #define CLIENT_LCCLIENT_H
 
 #include <QWidget>
+#include <QLineEdit>
+#include <QPushButton>
 
 #include "Client.h"
 
@@ -18,10 +20,14 @@ public:
     ~LCClient();
 
 public slots:
-
+    void connectToServer();
 signals:
 
 private:
+    QLineEdit* m_ipLine;
+    QLineEdit* m_portLine;
+    QPushButton* m_connectionButton;
+
     Client* m_client;
 
 };
