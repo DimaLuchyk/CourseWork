@@ -24,9 +24,10 @@ public:
     void stop();
 
     void addUser(const QUuid& uuid, const QString& userName, const QString& password);
-    void addFile(const QUuid& uuid, const QString& fileName, const QString& filePath, const QString& userId);
+    QUuid userExist(const QString& userName, const QString& password);
 
-    bool userExist(const QString& userName, const QString& password);
+    void addFile(const QUuid& uuid, const QString& fileName, const QString& filePath, const QString& userId);
+    //void removeFile();
     bool fileExist(const QString& fileName, const QString& filePath, const QString& userId);
 
 public slots:

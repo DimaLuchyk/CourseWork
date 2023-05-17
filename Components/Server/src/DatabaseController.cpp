@@ -89,34 +89,28 @@ void DatabaseController::addFile(const QUuid& uuid, const QString& fileName, con
     }
 }
 
-bool DatabaseController::userExist(const QString& userName, const QString& password)
+QUuid DatabaseController::userExist(const QString& userName, const QString& password)
 {
     if(!m_database.isOpen())
     {
-        qDebug() << "addFile failed to execute. database connection is not opened!\n";
-        return false;
+        qDebug() << "userExist failed to execute. database connection is not opened!\n";
+        return QUuid();
     }
 
     QSqlQuery query;
-    query.prepare("SELECT COUNT(*) FROM users WHERE username = :username AND password = :password");
+    query.prepare("SELECT uuid FROM user_id WHERE user_name = :user_name AND password = :password");
     query.bindValue(":user_name", userName);
     query.bindValue(":password", password);
 
     if (query.exec() && query.next())
     {
-        const int count = query.value(0).toInt();
+        qDebug() << "found user\n";
+        QString user_id = query.value(0).toString();
+        return QUuid(user_id);
+    }
 
-        if (count > 0)
-        {
-            return true;
-        }
-        return false;
-    }
-    else
-    {
-        qDebug() << "Failed to execute query:" << query.lastError().text();
-        return false;
-    }
+    qDebug() << "user didn't find\n";
+    return QUuid();
 }
 
 bool DatabaseController::fileExist(const QString& fileName, const QString& filePath, const QString& userId)
