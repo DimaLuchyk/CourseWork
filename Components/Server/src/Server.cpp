@@ -47,9 +47,18 @@ void Server::handleNewConnection()
     qDebug() << "handleNewConnection\n";
 
     QTcpSocket *socket = m_server->nextPendingConnection();
+
+    loginProcess(socket);
+
     QUuid uuid = QUuid::createUuid();
     m_clients.emplace(uuid, socket);
 
 
+
     //start processing client
+}
+
+void Server::loginProcess(QTcpSocket* client)
+{
+
 }

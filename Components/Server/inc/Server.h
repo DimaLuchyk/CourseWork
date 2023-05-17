@@ -27,6 +27,9 @@ public slots:
 public:
 
 private:
+    void loginProcess(QTcpSocket* client);
+
+private:
     class QUuidHash
     {
     public:
