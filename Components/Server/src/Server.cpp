@@ -30,6 +30,15 @@ Server::Server(QObject* parent)
 
 Server::~Server()
 {
+    //close connections with clients
+    for(const auto& client : m_clients)
+    {
+        if(client.second->isOpen())
+        {
+            client.second->close();
+        }
+    }
+
     m_dbController->stop();
 }
 
@@ -37,13 +46,10 @@ void Server::handleNewConnection()
 {
     qDebug() << "handleNewConnection\n";
 
-    // need to grab the socket
     QTcpSocket *socket = m_server->nextPendingConnection();
+    QUuid uuid = QUuid::createUuid();
+    m_clients.emplace(uuid, socket);
 
-    socket->write("Hello client\n");
-    socket->flush();
 
-    socket->waitForBytesWritten(3000);
-
-    socket->close();
+    //start processing client
 }

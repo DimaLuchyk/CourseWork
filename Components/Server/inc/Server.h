@@ -4,7 +4,8 @@
 #include <QObject>
 #include <QTcpServer>
 #include <QTcpSocket>
-#include <memory>
+#include <QUuid>
+
 #include <map>
 
 #include "DatabaseController.h"
@@ -26,8 +27,20 @@ public slots:
 public:
 
 private:
+    class QUuidHash
+    {
+    public:
+        std::size_t operator()(const QUuid& uuid) const
+        {
+            return qHash(uuid);
+        }
+    };
+
+private:
     QTcpServer* m_server;
     DatabaseController* m_dbController;
+
+    std::unordered_map<QUuid, QTcpSocket*, QUuidHash> m_clients;
 };
 
 
