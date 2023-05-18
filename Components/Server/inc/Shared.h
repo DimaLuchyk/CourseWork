@@ -6,6 +6,7 @@
 
 #include <QString>
 #include <QDateTime>
+#include <QByteArray>
 
 static const std::byte STARTOFPACKET{0xA7};
 
@@ -52,6 +53,11 @@ struct AuthenticationPayload
 {
     QString username;
     QString password;
+};
+
+struct Payload
+{
+    QByteArray payload;
 };
 
 PacketHeader generatePacketHeader(const PacketType packetType, const std::uint32_t payloadLength)
