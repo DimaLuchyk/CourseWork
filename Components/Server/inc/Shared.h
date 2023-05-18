@@ -60,12 +60,22 @@ struct Payload
     QByteArray payload;
 };
 
-PacketHeader generatePacketHeader(const PacketType packetType, const std::uint32_t payloadLength)
-{
-    QDateTime timeStamp = QDateTime::currentDateTimeUtc();
-    QString timeStampString = timeStamp.toString(Qt::ISODate);
 
-    return {STARTOFPACKET, 0, packetType, timeStampString, payloadLength};
-}
+class PacketGenerator
+{
+public:
+    static PacketHeader generatePacketHeader(const PacketType packetType, const std::uint32_t payloadLength)
+    {
+        return {STARTOFPACKET, 0, packetType, generateTimeStamp(), payloadLength};
+    }
+
+private:
+    static QString generateTimeStamp()
+    {
+        return QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+    }
+};
+
+
 
 #endif //SERVER_SHARED_H
