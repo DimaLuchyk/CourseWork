@@ -48,6 +48,12 @@ struct PacketHeader
     //payload
 };
 
+struct AuthenticationPayload
+{
+    QString username;
+    QString password;
+};
+
 PacketHeader generatePacketHeader(const PacketType packetType, const std::uint32_t payloadLength)
 {
     QDateTime timeStamp = QDateTime::currentDateTimeUtc();
