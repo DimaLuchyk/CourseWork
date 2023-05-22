@@ -8,43 +8,50 @@
 
 #include <map>
 
-#include "DatabaseController.h"
+#include "PacketProcessor/PacketProcessor.h"
 
-class Server : public QObject
+namespace coursework
 {
-    //Q_OBJECT
-public:
-    Server(QObject* parent = nullptr);
 
-    virtual ~Server();
-
-signals:
-
-public slots:
-    void handleNewConnection();
-
-
-public:
-
-private:
-    void loginProcess(QTcpSocket* client);
-
-private:
-    class QUuidHash
+    class Server : public QObject
     {
+        //Q_OBJECT
     public:
-        std::size_t operator()(const QUuid& uuid) const
+        Server(QObject *parent = nullptr);
+
+        virtual ~Server();
+
+    signals:
+
+    public slots:
+
+        void handleNewConnection();
+
+        void handleClientPacket();
+
+
+    public:
+
+
+
+    private:
+        class QUuidHash
         {
-            return qHash(uuid);
-        }
+        public:
+            std::size_t operator()(const QUuid &uuid) const
+            {
+                return qHash(uuid);
+            }
+        };
+
+    private:
+        QTcpServer *m_server;
+
+        protocol::PacketProcessor *m_packetProcessor;
+
+        std::unordered_map<QUuid, QTcpSocket *, QUuidHash> m_clients;
     };
 
-private:
-    QTcpServer* m_server;
-    DatabaseController* m_dbController;
-
-    std::unordered_map<QUuid, QTcpSocket*, QUuidHash> m_clients;
-};
-
+}
 
 #endif //SERVER_SERVER_H

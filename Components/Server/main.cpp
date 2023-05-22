@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     spdlog::shutdown();
 
 
-    Server s;
+    coursework::Server s;
 
     return QCoreApplication::exec();
 }

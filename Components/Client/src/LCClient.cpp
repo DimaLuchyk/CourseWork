@@ -25,6 +25,7 @@ LCClient::LCClient(QObject* parent)
 void LCClient::connectToServer()
 {
     m_client = new Client(m_ipLine->text(), m_portLine->text().toUInt(), this);
+
 }
 
 LCClient::~LCClient()

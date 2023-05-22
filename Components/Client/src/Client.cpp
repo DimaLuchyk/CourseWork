@@ -1,7 +1,3 @@
-//
-// Created by dany on 14.05.23.
-//
-
 #include "../inc/Client.h"
 
 Client::Client(const QString& ip, const std::uint16_t port, QObject* parent)
@@ -27,7 +23,7 @@ Client::Client(const QString& ip, const std::uint16_t port, QObject* parent)
 
 void Client::readTcpData()
 {
-    
+
 }
 
 Client::~Client()

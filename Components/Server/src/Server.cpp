@@ -4,7 +4,7 @@
 
 #include "Server.h"
 
-Server::Server(QObject* parent)
+coursework::Server::Server(QObject* parent)
     :
     QObject(parent)
 {
@@ -23,12 +23,9 @@ Server::Server(QObject* parent)
         qDebug() << "Server started!";
     }
 
-    m_dbController = new DatabaseController("localhost", 5432, "mydatabase", "myuser", "mypassword");
-    m_dbController->start();
-
 };
 
-Server::~Server()
+coursework::Server::~Server()
 {
     //close connections with clients
     for(const auto& client : m_clients)
@@ -38,27 +35,33 @@ Server::~Server()
             client.second->close();
         }
     }
-
-    m_dbController->stop();
 }
 
-void Server::handleNewConnection()
+void coursework::Server::handleNewConnection()
 {
     qDebug() << "handleNewConnection\n";
 
     QTcpSocket *socket = m_server->nextPendingConnection();
 
-    loginProcess(socket);
-
     QUuid uuid = QUuid::createUuid();
     m_clients.emplace(uuid, socket);
 
-
-
-    //start processing client
+    connect(socket, &QTcpSocket::readyRead, this, &Server::handleClientPacket);
 }
 
-void Server::loginProcess(QTcpSocket* client)
+void coursework::Server::handleClientPacket()
 {
+    qDebug() << "handleClientPacket\n";
+    QTcpSocket* client = qobject_cast<QTcpSocket*>(sender());
+    if (client)
+    {
+        QByteArray packet = client->readAll();
+        m_packetProcessor->handlePacket(packet, client);
+    }
+    else
+    {
+        // Failed to retrieve the sender as QTcpSocket
+        // Handle the situation accordingly
+    }
 
 }
