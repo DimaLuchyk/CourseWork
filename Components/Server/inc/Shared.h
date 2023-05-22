@@ -7,6 +7,7 @@
 #include <QString>
 #include <QDateTime>
 #include <QByteArray>
+#include <QDataStream>
 
 namespace coursework::protocol
 {
@@ -70,6 +71,27 @@ namespace coursework::protocol
         static PacketHeader generatePacketHeader(const PacketType packetType, const std::uint32_t payloadLength)
         {
             return {STARTOFPACKET, 0, packetType, generateTimeStamp(), payloadLength};
+        }
+
+        static QByteArray combineToPacket(const PacketHeader& header, const Payload& payload)
+        {
+            QByteArray packet;
+            QDataStream stream(&packet, QIODevice::WriteOnly);
+            stream.writeRawData(reinterpret_cast<const char*>(&header), sizeof(PacketHeader));
+            stream << payload.payload;
+
+            return packet;
+        }
+
+        static QByteArray combineToPacket(const PacketHeader* header, const AuthenticationPayload& payload)
+        {
+            QByteArray packet;
+            QDataStream stream(&packet, QIODevice::WriteOnly);
+            stream.writeRawData(reinterpret_cast<const char*>(&header), sizeof(PacketHeader));
+            stream << payload.username;
+            stream << payload.password;
+
+            return packet;
         }
 
     private:

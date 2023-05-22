@@ -17,7 +17,7 @@ Client::Client(const QString& ip, const std::uint16_t port, QObject* parent)
     connect( m_socket, &QTcpSocket::readyRead, this, &Client::readTcpData );
 
     m_socket->connectToHost(m_ip, m_port);
-    if( m_socket->waitForConnected() )
+    if(m_socket->waitForConnected() )
     {
         qDebug() << "connected to host\n";
         qDebug() << "writing message to the server\n";
@@ -27,8 +27,7 @@ Client::Client(const QString& ip, const std::uint16_t port, QObject* parent)
 
 void Client::readTcpData()
 {
-    QByteArray data = m_socket->readAll();
-    qDebug() << "from server: " << data;
+    
 }
 
 Client::~Client()

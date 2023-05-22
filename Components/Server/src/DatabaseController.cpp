@@ -89,7 +89,7 @@ void DatabaseController::addFile(const QUuid& uuid, const QString& fileName, con
     }
 }
 
-QUuid DatabaseController::userExist(const QString& userName, const QString& password)
+QUuid DatabaseController::userExist(const QString& userName)
 {
     if(!m_database.isOpen())
     {
@@ -98,9 +98,8 @@ QUuid DatabaseController::userExist(const QString& userName, const QString& pass
     }
 
     QSqlQuery query;
-    query.prepare("SELECT uuid FROM user_id WHERE user_name = :user_name AND password = :password");
+    query.prepare("SELECT uuid FROM user_id WHERE user_name = :user_name");
     query.bindValue(":user_name", userName);
-    query.bindValue(":password", password);
 
     if (query.exec() && query.next())
     {

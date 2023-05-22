@@ -24,7 +24,7 @@ public:
     void stop();
 
     void addUser(const QUuid& uuid, const QString& userName, const QString& password);
-    QUuid userExist(const QString& userName, const QString& password);
+    QUuid userExist(const QString& userName);
 
     void addFile(const QUuid& uuid, const QString& fileName, const QString& filePath, const QString& userId);
     //void removeFile();
