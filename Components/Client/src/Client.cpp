@@ -1,14 +1,11 @@
 #include "../inc/Client.h"
 
-Client::Client(const QString& ip, const std::uint16_t port, QObject* parent)
+coursework::client::Client::Client(const QString& ip, const std::uint16_t port, QObject* parent)
     :
     QObject(parent),
     m_ip(ip),
     m_port(port)
 {
-    std::string str("hello from client");
-    QByteArray data = QByteArray::fromStdString(str);
-
     m_socket = new QTcpSocket( this );
     connect( m_socket, &QTcpSocket::readyRead, this, &Client::readTcpData );
 
@@ -16,17 +13,30 @@ Client::Client(const QString& ip, const std::uint16_t port, QObject* parent)
     if(m_socket->waitForConnected() )
     {
         qDebug() << "connected to host\n";
-        qDebug() << "writing message to the server\n";
-        m_socket->write( data );
     }
 }
 
-void Client::readTcpData()
+void coursework::client::Client::sendData(const QByteArray& data)
+{
+    if(m_socket->isOpen())
+    {
+        m_socket->write(data);
+    }
+    else
+    {
+        qDebug() << "socket is not open!\n";
+    }
+}
+
+void coursework::client::Client::readTcpData()
 {
 
 }
 
-Client::~Client()
+coursework::client::Client::~Client()
 {
-
+    if(m_socket->isOpen())
+    {
+        m_socket->close();
+    }
 }

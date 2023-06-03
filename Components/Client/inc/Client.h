@@ -7,26 +7,35 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <QByteArray>
 
-class Client : public QObject
+namespace coursework::client
 {
-public:
-    //Q_OBJECT
 
-public:
-    Client(const QString& ip, const std::uint16_t port, QObject* parent = nullptr);
+    class Client : public QObject
+    {
+    public:
+        //Q_OBJECT
 
-    ~Client();
+    public:
+        Client(const QString &ip, const std::uint16_t port, QObject *parent = nullptr);
 
-public slots:
-    void readTcpData();
-signals:
+        ~Client();
 
-private:
-    QTcpSocket* m_socket;
-    QString m_ip;
-    std::uint16_t m_port;
-};
+        void sendData(const QByteArray &data);
 
+    public slots:
+
+        void readTcpData();
+
+    signals:
+
+    private:
+        QTcpSocket *m_socket;
+        QString m_ip;
+        std::uint16_t m_port;
+    };
+
+}
 
 #endif //SERVER_CLIENT_H
