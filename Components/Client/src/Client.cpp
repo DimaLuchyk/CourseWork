@@ -60,7 +60,7 @@ void coursework::Client::readTcpData()
         QDataStream stream(&packet, QIODevice::ReadOnly);
         stream.readRawData(reinterpret_cast<char*>(&header), sizeof(coursework::protocol::PacketHeader));
         stream >> payload.payload;
-        qDebug() << "from server: " << QString(payload.payload) << "\n";
+        //qDebug() << "from server: " << QString(payload.payload) << "\n";
         return;
     }
 

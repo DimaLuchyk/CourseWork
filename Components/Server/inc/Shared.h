@@ -50,7 +50,6 @@ namespace coursework::protocol
         PacketType packetType;              //packet type
         QString timeStamp;                  //time stamp
         std::uint32_t payloadLength;        //the length of the payload
-        //payload
     };
 
     struct AuthorizationPayload

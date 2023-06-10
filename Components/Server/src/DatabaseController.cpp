@@ -49,11 +49,13 @@ void DatabaseController::addUser(const QUuid& uuid, const QString& userName, con
         qDebug() << "addUser failed to execute. database connection is not opened!\n";
     }
 
-    QSqlQuery query;
-    query.prepare("INSERT INTO users (user_id, user_name, password) VALUES (:userid :username, :password)");
-    query.bindValue(":userid", uuid.toString());
+    QSqlQuery query(m_database);
+    query.prepare("INSERT INTO users (user_id, user_name, password) VALUES (:userid, :username, :password);");
+    auto uuidStr = uuid.toString();
+    query.bindValue(":userid", uuidStr.mid(1, uuidStr.length() - 2));
     query.bindValue(":username", userName);
     query.bindValue(":password", password);
+    //query.prepare("INSERT INTO users (user_id, user_name, password) VALUES ('123E4569-e89b-12d3-a456-426655440000', 'John', 'Bob');");
 
     if(query.exec())
     {
@@ -61,8 +63,11 @@ void DatabaseController::addUser(const QUuid& uuid, const QString& userName, con
     }
     else
     {
-        qDebug() << "Data failed to write to the db\n";
+        qDebug() << "Data failed to write to the db" << query.lastError().text() << "\n";
     }
+
+    qDebug() << "Query: " << query.lastQuery();
+    qDebug() << "uuid: " << uuid.toString();
 }
 
 void DatabaseController::addFile(const QUuid& uuid, const QString& fileName, const QString& filePath, const QString& userId)

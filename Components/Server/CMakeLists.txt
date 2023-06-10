@@ -15,7 +15,7 @@ find_package(Qt5 COMPONENTS
 add_executable(Server main.cpp src/Server.cpp src/DatabaseController.cpp inc/DatabaseController.h inc/Shared.h inc/PacketProcessor/PacketProcessor.h src/PacketProcessor/PacketProcessor.cpp inc/PacketProcessor/Tasks.h src/PacketProcessor/Tasks.cpp)
 
 include_directories(inc)
-include_directories(../../3rdparty/spdlog/include)
+include_directories(../../3rdparty/plog/include)
 
 target_link_libraries(Server
         Qt5::Core
