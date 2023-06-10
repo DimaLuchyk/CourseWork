@@ -5,19 +5,23 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
+#include <memory>
+
+#include "Client.h"
 
 namespace coursework::windows
 {
-    class AuthorisationWindow : public QWidget
+    class AuthorizationWindow : public QWidget
     {
         Q_OBJECT
     public:
-        AuthorisationWindow();
-        ~AuthorisationWindow();
+        AuthorizationWindow(std::shared_ptr<Client> client, QWidget* parent = nullptr);
+        ~AuthorizationWindow();
 
     private slots:
         void onLogInClicked();
         void onLogUpClicked();
+        void handleData();
 
     private:
         QLineEdit* m_userNameTextLine;
@@ -25,6 +29,8 @@ namespace coursework::windows
         QLabel* m_statusLine;
         QPushButton* m_loginButton;
         QPushButton* m_logupButton;
+
+        std::shared_ptr<Client> m_client;
     };
 }
 

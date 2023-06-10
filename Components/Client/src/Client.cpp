@@ -1,26 +1,47 @@
 #include "../inc/Client.h"
+#include "../../Server/inc/Shared.h"
 
-coursework::client::Client::Client(const QString& ip, const std::uint16_t port, QObject* parent)
+coursework::Client::Client(QObject* parent)
     :
-    QObject(parent),
-    m_ip(ip),
-    m_port(port)
+    QObject(parent)
 {
-    m_socket = new QTcpSocket( this );
-    connect( m_socket, &QTcpSocket::readyRead, this, &Client::readTcpData );
+}
 
-    m_socket->connectToHost(m_ip, m_port);
-    if(m_socket->waitForConnected() )
+coursework::Client::~Client()
+{
+    if(m_socket->isOpen())
     {
-        qDebug() << "connected to host\n";
+        m_socket->close();
     }
 }
 
-void coursework::client::Client::sendData(const QByteArray& data)
+QTcpSocket* coursework::Client::get()
+{
+    return m_socket;
+}
+
+bool coursework::Client::connect(const QString& ip, const std::uint16_t port)
+{
+    m_port = port;
+    m_ip = ip;
+
+    m_socket = new QTcpSocket(this);
+    QObject::connect(m_socket, &QTcpSocket::readyRead, this, &Client::readTcpData);
+    m_socket->connectToHost(m_ip, m_port);
+    if(m_socket->waitForConnected())
+    {
+        qDebug() << "connected\n";
+        return true;
+    }
+    return false;
+}
+
+void coursework::Client::sendData(const QByteArray& data) const
 {
     if(m_socket->isOpen())
     {
         m_socket->write(data);
+        return;
     }
     else
     {
@@ -28,15 +49,20 @@ void coursework::client::Client::sendData(const QByteArray& data)
     }
 }
 
-void coursework::client::Client::readTcpData()
-{
-
-}
-
-coursework::client::Client::~Client()
+void coursework::Client::readTcpData()
 {
     if(m_socket->isOpen())
     {
-        m_socket->close();
+        auto packet = m_socket->readAll();
+        coursework::protocol::Payload payload;
+        coursework::protocol::PacketHeader header;
+
+        QDataStream stream(&packet, QIODevice::ReadOnly);
+        stream.readRawData(reinterpret_cast<char*>(&header), sizeof(coursework::protocol::PacketHeader));
+        stream >> payload.payload;
+        qDebug() << "from server: " << QString(payload.payload) << "\n";
+        return;
     }
+
+    qDebug() << "socket is not open!\n";
 }

@@ -53,7 +53,7 @@ namespace coursework::protocol
         //payload
     };
 
-    struct AuthenticationPayload
+    struct AuthorizationPayload
     {
         QString username;
         QString password;
@@ -83,7 +83,7 @@ namespace coursework::protocol
             return packet;
         }
 
-        static QByteArray combineToPacket(const PacketHeader* header, const AuthenticationPayload& payload)
+        static QByteArray combineToPacket(const PacketHeader& header, const AuthorizationPayload& payload)
         {
             QByteArray packet;
             QDataStream stream(&packet, QIODevice::WriteOnly);

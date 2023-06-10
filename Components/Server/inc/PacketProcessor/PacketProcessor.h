@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include <QByteArray>
 #include <QThreadPool>
+#include <QRunnable>
 
 #include "DatabaseController.h"
 
@@ -15,15 +16,14 @@ namespace coursework::protocol
     {
         Q_OBJECT
     public:
-        PacketProcessor();
+        PacketProcessor(QObject* parent = nullptr);
         ~PacketProcessor();
 
-        void handlePacket(QByteArray packet, QTcpSocket* client);
+        void handlePacket(QByteArray& packet, QTcpSocket* client);
 
     private:
         DatabaseController *m_dbController;
-        QThreadPool* m_theadPool;
-
+        //QThreadPool* m_threadPool;
     };
 
 };

@@ -3,10 +3,12 @@
 //
 
 #include "Server.h"
+#include "Shared.h"
 
 coursework::Server::Server(QObject* parent)
     :
-    QObject(parent)
+    QObject(parent),
+    m_packetProcessor(new protocol::PacketProcessor(this))
 {
     m_server = new QTcpServer(this);
 
@@ -41,18 +43,19 @@ void coursework::Server::handleNewConnection()
 {
     qDebug() << "handleNewConnection\n";
 
-    QTcpSocket *socket = m_server->nextPendingConnection();
-
+    QTcpSocket* client = m_server->nextPendingConnection();
+    //client->write("message");
     QUuid uuid = QUuid::createUuid();
-    m_clients.emplace(uuid, socket);
+    m_clients.emplace(uuid, client);
 
-    connect(socket, &QTcpSocket::readyRead, this, &Server::handleClientPacket);
+    connect(client, &QTcpSocket::readyRead, this, &Server::handleClientPacket);
 }
 
 void coursework::Server::handleClientPacket()
 {
     qDebug() << "handleClientPacket\n";
-    QTcpSocket* client = qobject_cast<QTcpSocket*>(sender());
+    QTcpSocket* client = reinterpret_cast<QTcpSocket*>(sender());
+
     if (client)
     {
         QByteArray packet = client->readAll();

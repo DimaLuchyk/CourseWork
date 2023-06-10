@@ -4,6 +4,8 @@
 #include <QRunnable>
 #include <QTcpSocket>
 #include <QVariant>
+#include <QByteArray>
+#include <memory>
 #include "DatabaseController.h"
 
 namespace coursework::protocol
@@ -15,10 +17,14 @@ namespace coursework::protocol
 
     class BaseTask : public QRunnable
     {
+
     public:
         BaseTask(QTcpSocket* client, DatabaseController* dbController);
 
-        //void run() override; - each specific task should override it
+        void run() override
+        {
+            //nothing
+        }
 
     protected:
         DatabaseController* m_dbController;
@@ -37,7 +43,7 @@ namespace coursework::protocol
         QString m_password;
     };
 
-    class LogInTask : QRunnable
+    class LogInTask : public BaseTask
     {
     public:
         LogInTask(DatabaseController* dbController);

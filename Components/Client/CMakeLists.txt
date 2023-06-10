@@ -14,7 +14,7 @@ find_package(Qt5 COMPONENTS
         Network
         REQUIRED)
 
-add_executable(Client main.cpp src/Client.cpp inc/AuthorisationWindow.h src/AuthorisationWindow.cpp)
+add_executable(Client main.cpp src/Client.cpp inc/AuthorizationWindow.h inc/MainWindow.h inc/ConnectionWindow.h inc/ConnectionWindow.h inc/ConnectionWindow.h src/ConnectionWindow.cpp src/AuthorizationWindow.cpp)
 
 include_directories(inc)
 

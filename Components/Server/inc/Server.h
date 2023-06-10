@@ -46,6 +46,7 @@ namespace coursework
 
     private:
         QTcpServer *m_server;
+        QTcpSocket* m_client;
 
         protocol::PacketProcessor *m_packetProcessor;
 

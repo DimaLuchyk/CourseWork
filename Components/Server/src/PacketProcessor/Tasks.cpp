@@ -2,7 +2,6 @@
 #include "Shared.h"
 
 #include <QUuid>
-#include <QDataStream>
 
 coursework::protocol::BaseTask::BaseTask(QTcpSocket* client, DatabaseController *dbController)
     :
@@ -19,7 +18,7 @@ coursework::protocol::LogUpTask::LogUpTask(QTcpSocket* client, const QString use
     m_userName{userName},
     m_password{password}
 {
-
+    qDebug() << "LogUpTask ctor\n";
 }
 
 void coursework::protocol::LogUpTask::run()
@@ -32,6 +31,7 @@ void coursework::protocol::LogUpTask::run()
         m_client->write(PacketGenerator::combineToPacket(header, payload));
 
         qDebug() << "user already exists\n";
+
         return;
     }
 
@@ -42,6 +42,8 @@ void coursework::protocol::LogUpTask::run()
     PacketHeader header = PacketGenerator::generatePacketHeader(PacketType::LOG_UP_SUCCESS, sizeof(payload));
 
     m_client->write(PacketGenerator::combineToPacket(header, payload));
+
+
     qDebug() << "user registered\n";
 }
 

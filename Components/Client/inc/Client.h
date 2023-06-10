@@ -9,7 +9,7 @@
 #include <QTcpSocket>
 #include <QByteArray>
 
-namespace coursework::client
+namespace coursework
 {
 
     class Client : public QObject
@@ -18,22 +18,23 @@ namespace coursework::client
         //Q_OBJECT
 
     public:
-        Client(const QString &ip, const std::uint16_t port, QObject *parent = nullptr);
+        Client(QObject *parent = nullptr);
 
         ~Client();
 
-        void sendData(const QByteArray &data);
+    public:
+        QTcpSocket* get();
+
+        bool connect(const QString& ip, const std::uint16_t port);
+        void sendData(const QByteArray &data) const;
 
     public slots:
-
         void readTcpData();
-
-    signals:
 
     private:
         QTcpSocket *m_socket;
         QString m_ip;
-        std::uint16_t m_port;
+        std::uint16_t m_port = 0;
     };
 
 }
