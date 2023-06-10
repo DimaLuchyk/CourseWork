@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS files (
     file_id UUID PRIMARY KEY,
     file_name VARCHAR(255) NOT NULL,
     file_path TEXT NOT NULL,
-    user_id INTEGER NOT NULL,
+    user_id UUID NOT NULL,
     upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
