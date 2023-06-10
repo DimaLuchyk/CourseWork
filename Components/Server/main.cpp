@@ -12,6 +12,7 @@ int main(int argc, char *argv[]) {
 
 
     coursework::Server s;
+    s.start();
 
     return QCoreApplication::exec();
 }

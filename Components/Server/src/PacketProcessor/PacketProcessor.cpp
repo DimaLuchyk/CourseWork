@@ -11,8 +11,6 @@ coursework::protocol::PacketProcessor::PacketProcessor(QObject* parent)
     m_dbController = new DatabaseController("localhost", 5432, "mydatabase", "myuser", "mypassword", this);
     m_dbController->start();
 
-    QThreadPool::globalInstance()->setMaxThreadCount(8);
-
 }
 
 coursework::protocol::PacketProcessor::~PacketProcessor()
@@ -20,13 +18,13 @@ coursework::protocol::PacketProcessor::~PacketProcessor()
     m_dbController->stop();
 }
 
-void coursework::protocol::PacketProcessor::handlePacket(QByteArray& packet, QTcpSocket* client)
+QByteArray coursework::protocol::PacketProcessor::handlePacket(QByteArray& packet)
 {
     if(packet.isEmpty())
     {
         //log
         qDebug() << "packet is empty!";
-        return;
+        return {};
     }
 
     PacketHeader* header = reinterpret_cast<PacketHeader*>(packet.data());
@@ -46,18 +44,19 @@ void coursework::protocol::PacketProcessor::handlePacket(QByteArray& packet, QTc
             QString name = payload.username;
             QString password = payload.password;
 
-            auto task = new LogUpTask(client, payload.username, payload.password, m_dbController);
+            auto task = new LogUpTask(payload.username, payload.password, m_dbController);
 
+            return task->perform();
            /* QObject::connect(task, &LogUpTask::taskCompleted, this, [=](const QByteArray& data){
                 client->write(data);
                 client->flush();
             });*/
 
-            QThreadPool::globalInstance()->start(task);
+            //QThreadPool::globalInstance()->start(task);
             //task->run();
             break;
         //case...
     }
 
-
+    return {};
 }

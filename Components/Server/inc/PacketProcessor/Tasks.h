@@ -15,35 +15,31 @@ namespace coursework::protocol
     // does not implement run method inherited from QRunnable
     //=============================================================
 
-    class BaseTask : public QRunnable
+    class ITask : QObject
     {
 
     public:
-        BaseTask(QTcpSocket* client, DatabaseController* dbController);
+        ITask(DatabaseController* dbController);
 
-        void run() override
-        {
-            //nothing
-        }
+        virtual QByteArray perform() = 0;
 
     protected:
         DatabaseController* m_dbController;
-        QTcpSocket* m_client;
     };
 
-    class LogUpTask : public BaseTask
+    class LogUpTask : public ITask
     {
     public:
-        LogUpTask(QTcpSocket* client, const QString userName, const QString password, DatabaseController* dbController);
+        LogUpTask(const QString userName, const QString password, DatabaseController* dbController);
 
-        void run() override;
+        QByteArray perform() override;
 
     private:
         QString m_userName;
         QString m_password;
     };
 
-    class LogInTask : public BaseTask
+    /*class LogInTask : public BaseTask
     {
     public:
         LogInTask(DatabaseController* dbController);
@@ -54,7 +50,7 @@ namespace coursework::protocol
         QString m_userName;
         QString m_password;
 
-    };
+    };*/
 
     //other
 }

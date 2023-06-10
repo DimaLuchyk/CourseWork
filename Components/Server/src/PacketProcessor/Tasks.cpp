@@ -3,36 +3,35 @@
 
 #include <QUuid>
 
-coursework::protocol::BaseTask::BaseTask(QTcpSocket* client, DatabaseController *dbController)
+coursework::protocol::ITask::ITask(DatabaseController *dbController)
     :
-    m_client{client},
     m_dbController(dbController)
 {
 
 }
 
-coursework::protocol::LogUpTask::LogUpTask(QTcpSocket* client, const QString userName, const QString password,
+coursework::protocol::LogUpTask::LogUpTask(const QString userName, const QString password,
                                            DatabaseController *dbController)
     :
-    BaseTask(client, dbController),
+    ITask(dbController),
     m_userName{userName},
     m_password{password}
 {
     qDebug() << "LogUpTask ctor\n";
 }
 
-void coursework::protocol::LogUpTask::run()
+QByteArray coursework::protocol::LogUpTask::perform()
 {
     if(!m_dbController->userExist(m_userName).isNull())
     {
         Payload payload{"The user is already registered"};
         PacketHeader header = PacketGenerator::generatePacketHeader(PacketType::LOG_UP_FAILURE, sizeof(payload));
 
-        m_client->write(PacketGenerator::combineToPacket(header, payload));
+        //m_client->write(PacketGenerator::combineToPacket(header, payload));
 
         qDebug() << "user already exists\n";
 
-        return;
+        return PacketGenerator::combineToPacket(header, payload);
     }
 
     QUuid uuid = QUuid::createUuid();
@@ -41,13 +40,8 @@ void coursework::protocol::LogUpTask::run()
     Payload payload{"User registered"};
     PacketHeader header = PacketGenerator::generatePacketHeader(PacketType::LOG_UP_SUCCESS, sizeof(payload));
 
-    m_client->write(PacketGenerator::combineToPacket(header, payload));
-
-
     qDebug() << "user registered\n";
+
+    return PacketGenerator::combineToPacket(header, payload);
 }
 
-void coursework::protocol::LogInTask::run()
-{
-
-}

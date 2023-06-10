@@ -13,15 +13,16 @@
 namespace coursework
 {
 
-    class Server : public QObject
+    class Server : public QTcpServer
     {
         //Q_OBJECT
     public:
-        Server(QObject *parent = nullptr);
+        explicit Server(QObject *parent = nullptr);
 
         virtual ~Server();
 
-    signals:
+    public:
+        bool start();
 
     public slots:
 
@@ -30,9 +31,8 @@ namespace coursework
         void handleClientPacket();
 
 
-    public:
-
-
+    protected:
+        void incomingConnection(qintptr socketDescriptor);
 
     private:
         class QUuidHash
@@ -45,10 +45,7 @@ namespace coursework
         };
 
     private:
-        QTcpServer *m_server;
         QTcpSocket* m_client;
-
-        protocol::PacketProcessor *m_packetProcessor;
 
         std::unordered_map<QUuid, QTcpSocket *, QUuidHash> m_clients;
     };

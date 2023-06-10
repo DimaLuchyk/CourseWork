@@ -19,11 +19,10 @@ namespace coursework::protocol
         PacketProcessor(QObject* parent = nullptr);
         ~PacketProcessor();
 
-        void handlePacket(QByteArray& packet, QTcpSocket* client);
+        QByteArray handlePacket(QByteArray& packet);
 
     private:
         DatabaseController *m_dbController;
-        //QThreadPool* m_threadPool;
     };
 
 };
