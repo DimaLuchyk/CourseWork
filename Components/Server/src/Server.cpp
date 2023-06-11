@@ -40,7 +40,6 @@ public:
 
         PLOG_INFO << m_socketDescriptor << ": socket descriptor, connected to the server.";
 
-
         exec();
     }
 
@@ -53,8 +52,7 @@ public slots:
 
     void disconnected()
     {
-        qDebug() << m_socketDescriptor << " Disconnected";
-
+        PLOG_INFO << m_socketDescriptor << " disconnected";
 
         m_socket->deleteLater();
     }

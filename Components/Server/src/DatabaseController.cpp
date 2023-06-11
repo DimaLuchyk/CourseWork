@@ -1,6 +1,7 @@
-#include "DatabaseController.h"
-
 #include <QDebug>
+
+#include "DatabaseController.h"
+#include "plog/Log.h"
 
 DatabaseController::DatabaseController(const QString& host, const std::uint16_t port, const QString& databaseName,
                                        const QString& userName, const QString& password, QObject* parent)
@@ -12,23 +13,34 @@ DatabaseController::DatabaseController(const QString& host, const std::uint16_t 
     m_userName(userName),
     m_password(password)
 {
+    PLOG_DEBUG << "DatabaseController ctor";
+
     m_database = QSqlDatabase::addDatabase("QPSQL");
     m_database.setHostName(m_host);
     m_database.setPort(m_port);
     m_database.setDatabaseName(m_databaseName);
     m_database.setUserName(m_userName);
     m_database.setPassword(m_password);
+
+    PLOG_INFO << "DatabaseController settings: {HOST: " << host.toStdString().c_str() <<
+              ", PORT: " << port << ", databaseName: " << databaseName.toStdString().c_str() <<
+              ", UserName: " << userName.toStdString().c_str() << ", Password: " << password.toStdString().c_str() << "}";
+}
+
+DatabaseController::~DatabaseController()
+{
+    PLOG_DEBUG << "DabaseController dtor";
 }
 
 void DatabaseController::start()
 {
     if (m_database.open())
     {
-        qDebug() << "Connected!\n";
+        PLOG_INFO << "DatabaseController connected to the database";
     }
     else
     {
-        qDebug() << "Database Error:" << m_database.lastError().text() + "\n";
+        PLOG_ERROR << "DatabaseController failed to connect to the database. Error:" << m_database.lastError().text().toStdString().c_str();
     }
 
 }
@@ -38,7 +50,7 @@ void DatabaseController::stop()
     if(m_database.isOpen())
     {
         m_database.close();
-        qDebug() << "database connection was closed!\n";
+        PLOG_INFO << "Database connection was closed.";
     }
 }
 
@@ -46,7 +58,8 @@ void DatabaseController::addUser(const QUuid& uuid, const QString& userName, con
 {
     if(!m_database.isOpen())
     {
-        qDebug() << "addUser failed to execute. database connection is not opened!\n";
+        PLOG_ERROR << "Database connection is not opened";
+        return;
     }
 
     QSqlQuery query(m_database);
@@ -55,19 +68,16 @@ void DatabaseController::addUser(const QUuid& uuid, const QString& userName, con
     query.bindValue(":userid", uuidStr.mid(1, uuidStr.length() - 2));
     query.bindValue(":username", userName);
     query.bindValue(":password", password);
-    //query.prepare("INSERT INTO users (user_id, user_name, password) VALUES ('123E4569-e89b-12d3-a456-426655440000', 'John', 'Bob');");
 
     if(query.exec())
     {
-        qDebug() << "Data were written to the db\n";
+        PLOG_INFO << "User was added to the database. User {user_id: " << uuidStr.toStdString().c_str() << ", user_name: " << userName << ", password: " << password << "}";
     }
     else
     {
-        qDebug() << "Data failed to write to the db" << query.lastError().text() << "\n";
+        PLOG_ERROR << "Failed to add user to the database. User {user_id: " << uuidStr.toStdString().c_str() << ", user_name: " << userName << ", password: " << password << "}";;
     }
 
-    qDebug() << "Query: " << query.lastQuery();
-    qDebug() << "uuid: " << uuid.toString();
 }
 
 void DatabaseController::addFile(const QUuid& uuid, const QString& fileName, const QString& filePath, const QString& userId)
@@ -75,6 +85,7 @@ void DatabaseController::addFile(const QUuid& uuid, const QString& fileName, con
     if(!m_database.isOpen())
     {
         qDebug() << "addFile failed to execute. database connection is not opened!\n";
+        return;
     }
 
     QSqlQuery query;
@@ -98,22 +109,22 @@ QUuid DatabaseController::userExist(const QString& userName)
 {
     if(!m_database.isOpen())
     {
-        qDebug() << "userExist failed to execute. database connection is not opened!\n";
-        return QUuid();
+        PLOG_ERROR << "Database connection is not opened";
+        return QUuid{};
     }
 
     QSqlQuery query;
-    query.prepare("SELECT uuid FROM user_id WHERE user_name = :user_name");
+    query.prepare("SELECT user_id FROM users WHERE user_name = :user_name");
     query.bindValue(":user_name", userName);
 
     if (query.exec() && query.next())
     {
-        qDebug() << "found user\n";
+        PLOG_INFO << "There's user with such name. Name: " << userName;
         QString user_id = query.value(0).toString();
         return QUuid(user_id);
     }
 
-    qDebug() << "user didn't find\n";
+    PLOG_INFO << "There's no user with such name. Name: " << userName;
     return QUuid();
 }
 
@@ -146,9 +157,4 @@ bool DatabaseController::fileExist(const QString& fileName, const QString& fileP
         qDebug() << "Failed to execute query:" << query.lastError().text();
         return false;
     }
-}
-
-DatabaseController::~DatabaseController()
-{
-
 }

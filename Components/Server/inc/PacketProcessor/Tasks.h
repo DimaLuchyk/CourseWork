@@ -30,7 +30,8 @@ namespace coursework::protocol
     class LogUpTask : public ITask
     {
     public:
-        LogUpTask(const QString userName, const QString password, DatabaseController* dbController);
+        LogUpTask(const QString& userName, const QString& password, DatabaseController* dbController);
+        ~LogUpTask();
 
         QByteArray perform() override;
 
@@ -39,18 +40,19 @@ namespace coursework::protocol
         QString m_password;
     };
 
-    /*class LogInTask : public BaseTask
+    class LogInTask : public ITask
     {
     public:
-        LogInTask(DatabaseController* dbController);
+        LogInTask(const QString& userName, const QString& password, DatabaseController* dbController);
+        ~LogInTask();
 
-        void run() override;
+        QByteArray perform() override;
 
     private:
         QString m_userName;
         QString m_password;
 
-    };*/
+    };
 
     //other
 }

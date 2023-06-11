@@ -1,6 +1,7 @@
 #include "PacketProcessor/PacketProcessor.h"
 #include "PacketProcessor/Tasks.h"
 #include "Shared.h"
+#include "plog/Log.h"
 
 #include <QDebug>
 
@@ -8,6 +9,8 @@ coursework::protocol::PacketProcessor::PacketProcessor(QObject* parent)
     :
     QObject(parent)
 {
+    PLOG_DEBUG << "PacketProcessor ctor";
+
     m_dbController = new DatabaseController("localhost", 5432, "mydatabase", "myuser", "mypassword", this);
     m_dbController->start();
 
@@ -15,6 +18,7 @@ coursework::protocol::PacketProcessor::PacketProcessor(QObject* parent)
 
 coursework::protocol::PacketProcessor::~PacketProcessor()
 {
+    PLOG_DEBUG << "PacketProcessor dtor";
     m_dbController->stop();
 }
 
@@ -22,41 +26,41 @@ QByteArray coursework::protocol::PacketProcessor::handlePacket(QByteArray& packe
 {
     if(packet.isEmpty())
     {
-        //log
-        qDebug() << "packet is empty!";
+        PLOG_WARNING << "received empty packet for processing";
         return {};
     }
 
     PacketHeader* header = reinterpret_cast<PacketHeader*>(packet.data());
 
-    switch(header->packetType)
+    std::shared_ptr<ITask> task;
+
+    if(header->packetType == PacketType::LOG_IN)
     {
-        case LOG_IN:
-            break;
-        case LOG_UP:
-            AuthorizationPayload payload;
+        AuthorizationPayload logInPayload;
 
-            QDataStream stream(&packet, QIODevice::ReadOnly);
-            stream.readRawData(reinterpret_cast<char*>(header), sizeof(PacketHeader));
-            stream >> payload.username;
-            stream >> payload.password;
+        QDataStream logInStream(&packet, QIODevice::ReadOnly);
+        logInStream.readRawData(reinterpret_cast<char*>(header), sizeof(PacketHeader));
+        logInStream >> logInPayload.username;
+        logInStream >> logInPayload.password;
 
-            QString name = payload.username;
-            QString password = payload.password;
+        task = std::make_shared<LogInTask>(logInPayload.username, logInPayload.password, m_dbController);
+    }
+    else if(header->packetType == PacketType::LOG_UP)
+    {
+        AuthorizationPayload payload;
 
-            auto task = new LogUpTask(payload.username, payload.password, m_dbController);
+        QDataStream stream(&packet, QIODevice::ReadOnly);
+        stream.readRawData(reinterpret_cast<char*>(header), sizeof(PacketHeader));
+        stream >> payload.username;
+        stream >> payload.password;
 
-            return task->perform();
-           /* QObject::connect(task, &LogUpTask::taskCompleted, this, [=](const QByteArray& data){
-                client->write(data);
-                client->flush();
-            });*/
 
-            //QThreadPool::globalInstance()->start(task);
-            //task->run();
-            break;
-        //case...
+        task = std::make_shared<LogUpTask>(payload.username, payload.password, m_dbController);
+    }
+    else
+    {
+        PLOG_WARNING << "UNKNOWN PacketType received. PacketType: " << header->packetType;
     }
 
-    return {};
+    return task->perform();
 }

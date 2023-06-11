@@ -60,7 +60,7 @@ namespace coursework::protocol
 
     struct Payload
     {
-        QByteArray payload;
+        QString payload;
     };
 
 
