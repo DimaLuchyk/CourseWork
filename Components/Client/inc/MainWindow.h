@@ -5,14 +5,19 @@
 #include <QPushButton>
 #include <QLabel>
 
+#include <memory>
+
+#include "Client.h"
+#include "NetworkClient.h"
+
 namespace coursework::windows
 {
     class MainWindow : public QWidget
     {
         Q_OBJECT
     public:
-        MainWindow(QWidget* parent = nullptr){};
-        ~MainWindow(){};
+        MainWindow(std::shared_ptr<NetworkClient> client, QWidget* parent = nullptr);
+        ~MainWindow();
 
     private slots:
 
@@ -20,6 +25,8 @@ namespace coursework::windows
     private:
         QLabel* m_line;
         QPushButton* m_btn;
+
+        std::shared_ptr<NetworkClient> m_client;
     };
 }
 

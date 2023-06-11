@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "Client.h"
+#include "NetworkClient.h"
 
 namespace coursework::windows
 {
@@ -15,7 +16,7 @@ namespace coursework::windows
     {
         Q_OBJECT
     public:
-        ConnectionWindow(std::shared_ptr<Client> client, QWidget* parent = nullptr);
+        ConnectionWindow(std::shared_ptr<NetworkClient> client, QWidget* parent = nullptr);
         ~ConnectionWindow();
 
     private slots:
@@ -32,7 +33,7 @@ namespace coursework::windows
         QLabel* m_statusBar;
         QPushButton* m_connectionButton;
 
-        std::shared_ptr<Client> m_client;
+        std::shared_ptr<NetworkClient> m_client;
     };
 }
 

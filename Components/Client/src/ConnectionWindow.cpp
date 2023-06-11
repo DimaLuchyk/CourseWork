@@ -3,7 +3,7 @@
 #include <QWidget>
 #include <QGridLayout>
 
-coursework::windows::ConnectionWindow::ConnectionWindow(std::shared_ptr<coursework::Client> client, QWidget *parent)
+coursework::windows::ConnectionWindow::ConnectionWindow(std::shared_ptr<coursework::NetworkClient> client, QWidget *parent)
     :
     QWidget(parent),
     m_client(client)
@@ -36,7 +36,7 @@ void coursework::windows::ConnectionWindow::connectToServer()
     const std::uint16_t port = m_portLineEdit->text().toUInt();
     const QString ip = m_ipLineEdit->text();
 
-    if(m_client->connect(ip, port))
+    if(m_client->connectToServer(ip, port))
     {
         emit connectedToServer();
         qDebug() << "connected to server\n";

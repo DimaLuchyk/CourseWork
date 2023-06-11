@@ -1,10 +1,12 @@
 #include "../inc/Client.h"
 #include "../../Server/inc/Shared.h"
 
-coursework::Client::Client(QObject* parent)
+
+coursework::Client::Client(QObject *parent)
     :
     QObject(parent)
 {
+
 }
 
 coursework::Client::~Client()
@@ -20,7 +22,7 @@ QTcpSocket* coursework::Client::get()
     return m_socket;
 }
 
-bool coursework::Client::connect(const QString& ip, const std::uint16_t port)
+bool coursework::Client::connectToServer(const QString& ip, const std::uint16_t port)
 {
     m_port = port;
     m_ip = ip;
@@ -36,7 +38,7 @@ bool coursework::Client::connect(const QString& ip, const std::uint16_t port)
     return false;
 }
 
-void coursework::Client::sendData(const QByteArray& data) const
+void coursework::Client::sendData(const QByteArray &data) const
 {
     if(m_socket->isOpen())
     {
@@ -49,20 +51,12 @@ void coursework::Client::sendData(const QByteArray& data) const
     }
 }
 
-void coursework::Client::readTcpData()
+
+QByteArray coursework::Client::readTcpData()
 {
     if(m_socket->isOpen())
     {
         auto packet = m_socket->readAll();
-        coursework::protocol::Payload payload;
-        coursework::protocol::PacketHeader header;
-
-        QDataStream stream(&packet, QIODevice::ReadOnly);
-        stream.readRawData(reinterpret_cast<char*>(&header), sizeof(coursework::protocol::PacketHeader));
-        stream >> payload.payload;
-        //qDebug() << "from server: " << QString(payload.payload) << "\n";
-        return;
+        return packet;
     }
-
-    qDebug() << "socket is not open!\n";
 }

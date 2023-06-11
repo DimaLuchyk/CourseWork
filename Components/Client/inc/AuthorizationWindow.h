@@ -5,9 +5,9 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
-#include <memory>
 
 #include "Client.h"
+#include "NetworkClient.h"
 
 namespace coursework::windows
 {
@@ -15,13 +15,18 @@ namespace coursework::windows
     {
         Q_OBJECT
     public:
-        AuthorizationWindow(std::shared_ptr<Client> client, QWidget* parent = nullptr);
+        AuthorizationWindow(std::shared_ptr<NetworkClient> client, QWidget* parent = nullptr);
         ~AuthorizationWindow();
 
     private slots:
         void onLogInClicked();
         void onLogUpClicked();
-        void handleData();
+
+    public slots:
+        void handlePacket();
+
+    signals:
+        void loggedIn();
 
     private:
         QLineEdit* m_userNameTextLine;
@@ -30,7 +35,7 @@ namespace coursework::windows
         QPushButton* m_loginButton;
         QPushButton* m_logupButton;
 
-        std::shared_ptr<Client> m_client;
+        std::shared_ptr<NetworkClient> m_client;
     };
 }
 

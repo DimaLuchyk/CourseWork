@@ -1,40 +1,40 @@
-//
-// Created by dany on 14.05.23.
-//
-
 #ifndef SERVER_CLIENT_H
 #define SERVER_CLIENT_H
 
-#include <QObject>
+//#include <QObject>
 #include <QTcpSocket>
 #include <QByteArray>
+
+//#include "../../Server/inc/Shared.h"
 
 namespace coursework
 {
 
     class Client : public QObject
     {
-    public:
         //Q_OBJECT
-
     public:
-        Client(QObject *parent = nullptr);
+        Client(QObject* parent = nullptr);
 
         ~Client();
 
-    public:
         QTcpSocket* get();
 
-        bool connect(const QString& ip, const std::uint16_t port);
+        bool connectToServer(const QString& ip, const std::uint16_t port);
+
         void sendData(const QByteArray &data) const;
 
     public slots:
-        void readTcpData();
+        QByteArray readTcpData();
+
+    signals:
+        void loggedIn();
 
     private:
-        QTcpSocket *m_socket;
+        QTcpSocket* m_socket;
         QString m_ip;
         std::uint16_t m_port = 0;
+
     };
 
 }
