@@ -1,5 +1,6 @@
 #include "AuthorizationWindow.h"
 #include "../../Server/inc/Shared.h"
+#include "NetworkClient.h"
 
 #include <QLabel>
 #include <QGridLayout>
@@ -23,12 +24,13 @@ coursework::windows::AuthorizationWindow::AuthorizationWindow(std::shared_ptr<Ne
     layout->addWidget(passwordLabel, 2, 0, 1, 1);
     layout->addWidget(m_passwordTextLine, 3, 0, 1, 2);
     layout->addWidget(m_statusLine, 4, 0, 1, 2);
-    layout->addWidget(m_loginButton, 4, 0, 1, 1);
-    layout->addWidget(m_logupButton, 4, 1, 1, 1);
+    layout->addWidget(m_loginButton, 5, 0, 1, 1);
+    layout->addWidget(m_logupButton, 5, 1, 1, 1);
     setLayout(layout);
 
     connect(m_loginButton, &QPushButton::clicked, this, &AuthorizationWindow::onLogInClicked);
     connect(m_logupButton, &QPushButton::clicked, this, &AuthorizationWindow::onLogUpClicked);
+    //connect(m_client, &coursework::NetworkClient::loggedUp, m_statusLine, &QLabel::setText);
 }
 
 coursework::windows::AuthorizationWindow::~AuthorizationWindow()

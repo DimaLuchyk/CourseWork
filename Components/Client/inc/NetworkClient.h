@@ -81,7 +81,13 @@ namespace coursework
                 }
                 else if(header->packetType == coursework::protocol::PacketType::LOG_IN_FAILURE)
                 {
-                    qDebug() << "logINFailure";
+                    coursework::protocol::Payload payload;
+
+                    QDataStream stream(&packet, QIODevice::ReadOnly);
+                    stream.readRawData(reinterpret_cast<char *>(header), sizeof(coursework::protocol::PacketHeader));
+                    stream >> payload.payload;
+
+                    emit failedToLogIn(payload.payload);
                 }
                 else if(header->packetType == coursework::protocol::PacketType::LOG_UP_SUCCESS)
                 {
@@ -90,10 +96,18 @@ namespace coursework
                     QDataStream stream(&packet, QIODevice::ReadOnly);
                     stream.readRawData(reinterpret_cast<char *>(header), sizeof(coursework::protocol::PacketHeader));
                     stream >> payload.payload;
+
+                    emit loggedUp(payload.payload);
                 }
                 else if(header->packetType == coursework::protocol::PacketType::LOG_UP_FAILURE)
                 {
-                    qDebug() << "logUpFailure";
+                    coursework::protocol::Payload payload;
+
+                    QDataStream stream(&packet, QIODevice::ReadOnly);
+                    stream.readRawData(reinterpret_cast<char *>(header), sizeof(coursework::protocol::PacketHeader));
+                    stream >> payload.payload;
+
+                    emit failedToLogUp(payload.payload);
                 }
 
                 return packet;
@@ -102,6 +116,9 @@ namespace coursework
 
     signals:
         void loggedIn();
+        void loggedUp(const QString& status);
+        void failedToLogIn(const QString& status);
+        void failedToLogUp(const QString& status);
 
     private:
         QTcpSocket* m_socket;
