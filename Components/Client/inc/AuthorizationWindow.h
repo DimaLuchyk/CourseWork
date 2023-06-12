@@ -22,12 +22,6 @@ namespace coursework::windows
         void onLogInClicked();
         void onLogUpClicked();
 
-    public slots:
-        void handlePacket();
-
-    signals:
-        void loggedIn();
-
     private:
         QLineEdit* m_userNameTextLine;
         QLineEdit* m_passwordTextLine;

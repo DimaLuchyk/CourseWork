@@ -66,7 +66,7 @@ QByteArray coursework::protocol::LogInTask::perform()
 {
     PLOG_DEBUG << "perform";
 
-    if(!m_dbController->userExist(m_userName).isNull())
+    if(!m_dbController->checkUserCredentials(m_userName, m_password).isNull())
     {
         Payload payload{"The user was found"};
         PacketHeader header = PacketGenerator::generatePacketHeader(PacketType::LOG_IN_SUCCESS, sizeof(payload));
@@ -74,7 +74,7 @@ QByteArray coursework::protocol::LogInTask::perform()
         return PacketGenerator::combineToPacket(header, payload);
     }
 
-    Payload payload{"User was not found. You should register first"};
+    Payload payload{"You should register first. Or wrong credentials."};
     PacketHeader header = PacketGenerator::generatePacketHeader(PacketType::LOG_IN_FAILURE, sizeof(payload));
 
     return PacketGenerator::combineToPacket(header, payload);

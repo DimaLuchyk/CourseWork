@@ -128,6 +128,32 @@ QUuid DatabaseController::userExist(const QString& userName)
     return QUuid();
 }
 
+QUuid DatabaseController::checkUserCredentials(const QString& userName, const QString& password)
+{
+    if(!m_database.isOpen())
+    {
+        PLOG_ERROR << "Database connection is not opened";
+        return QUuid{};
+    }
+
+    QSqlQuery query;
+    query.prepare("SELECT user_id FROM users WHERE user_name = :user_name AND password = :user_password");
+    query.bindValue(":user_name", userName);
+    query.bindValue(":user_password", password);
+
+    if (query.exec() && query.next())
+    {
+        PLOG_INFO << "There's user with such name. Name: " << userName;
+        QString user_id = query.value(0).toString();
+        return QUuid(user_id);
+    }
+
+    PLOG_INFO << "There's no user with such name and password. Name: " << userName;
+    return QUuid();
+}
+
+
+
 bool DatabaseController::fileExist(const QString& fileName, const QString& filePath, const QString& userId)
 {
     if(!m_database.isOpen())

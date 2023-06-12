@@ -30,7 +30,10 @@ coursework::windows::AuthorizationWindow::AuthorizationWindow(std::shared_ptr<Ne
 
     connect(m_loginButton, &QPushButton::clicked, this, &AuthorizationWindow::onLogInClicked);
     connect(m_logupButton, &QPushButton::clicked, this, &AuthorizationWindow::onLogUpClicked);
-    //connect(m_client, &coursework::NetworkClient::loggedUp, m_statusLine, &QLabel::setText);
+    connect(m_client.get(), &coursework::NetworkClient::loggedUp, m_statusLine, &QLabel::setText);
+    connect(m_client.get(), &coursework::NetworkClient::failedToLogUp, m_statusLine, &QLabel::setText);
+    connect(m_client.get(), &coursework::NetworkClient::failedToLogIn, m_statusLine, &QLabel::setText);
+
 }
 
 coursework::windows::AuthorizationWindow::~AuthorizationWindow()
@@ -44,6 +47,12 @@ void coursework::windows::AuthorizationWindow::onLogInClicked()
     payload.username = m_userNameTextLine->text();
     payload.password = m_passwordTextLine->text();
 
+    if(payload.username.isEmpty() || payload.password.isEmpty())
+    {
+        qDebug() << "not valid credentials";
+        return;
+    }
+
     auto header = coursework::protocol::PacketGenerator::generatePacketHeader(coursework::protocol::PacketType::LOG_IN,
                                                                               sizeof(payload));
 
@@ -56,42 +65,14 @@ void coursework::windows::AuthorizationWindow::onLogUpClicked()
     payload.username = m_userNameTextLine->text();
     payload.password = m_passwordTextLine->text();
 
+    if(payload.username.isEmpty() || payload.password.isEmpty())
+    {
+        qDebug() << "not valid credentials";
+        return;
+    }
+
     auto header = coursework::protocol::PacketGenerator::generatePacketHeader(coursework::protocol::PacketType::LOG_UP,
                                                                               sizeof(payload));
 
     m_client->sendData(coursework::protocol::PacketGenerator::combineToPacket(header, payload));
-}
-
-void coursework::windows::AuthorizationWindow::handlePacket()
-{
-    auto packet = m_client->readTcpData();
-    coursework::protocol::PacketHeader* header = reinterpret_cast<coursework::protocol::PacketHeader*>(packet.data());
-    coursework::protocol::Payload payload;
-
-    QDataStream stream(&packet, QIODevice::ReadOnly);
-    stream.readRawData(reinterpret_cast<char*>(header), sizeof(coursework::protocol::PacketHeader));
-    stream >> payload.payload;
-
-    if(header->packetType == coursework::protocol::PacketType::LOG_IN_SUCCESS)
-    {
-        QObject::disconnect(m_client->get(), &QTcpSocket::readyRead, this, &AuthorizationWindow::handlePacket);
-        emit loggedIn();
-        qDebug() << "LOG_IN_SUCCESS";
-        qDebug() << "from server: " << payload.payload;
-    }
-    else if(header->packetType == coursework::protocol::PacketType::LOG_IN_FAILURE)
-    {
-        qDebug() << "LOG_IN_FAILURE";
-        qDebug() << "from server: " << payload.payload;
-    }
-    else if(header->packetType == coursework::protocol::PacketType::LOG_UP_SUCCESS)
-    {
-        qDebug() << "LOG_UP_SUCCESS";
-        qDebug() << "from server: " << payload.payload;
-    }
-    else if(header->packetType == coursework::protocol::PacketType::LOG_UP_FAILURE)
-    {
-        qDebug() << "LOG_UP_ERROR";
-        qDebug() << "from server: " << payload.payload;
-    }
 }

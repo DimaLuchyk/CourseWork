@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include <QGridLayout>
 
+/*
 coursework::windows::MainWindow::MainWindow(std::shared_ptr<NetworkClient> client, QWidget *parent)
     :
     QWidget(parent),
@@ -15,4 +16,4 @@ coursework::windows::MainWindow::MainWindow(std::shared_ptr<NetworkClient> clien
 coursework::windows::MainWindow::~MainWindow() noexcept
 {
 
-}
+}*/
