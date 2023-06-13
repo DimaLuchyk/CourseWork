@@ -27,6 +27,23 @@ namespace coursework::protocol
         DatabaseController* m_dbController;
     };
 
+    class TempTask : public ITask
+    {
+    public:
+        TempTask(DatabaseController* dbController)
+        :
+        ITask(dbController)
+        {
+
+        }
+
+        QByteArray perform() override
+        {
+            qDebug() << "TempTask";
+            return {};
+        }
+    };
+
     class LogUpTask : public ITask
     {
     public:
@@ -68,10 +85,15 @@ namespace coursework::protocol
     class AddFileTask : public ITask
     {
     public:
-        AddFileTask(DatabaseController* dbController);
+        AddFileTask(const QString& fileName, const QByteArray& fileData, const QUuid& userId, DatabaseController* dbController);
         ~AddFileTask();
 
         QByteArray perform() override;
+
+    private:
+        QByteArray m_fileData;
+        QString m_fileName;
+        QUuid m_userId;
     };
 }
 

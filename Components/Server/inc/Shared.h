@@ -62,7 +62,7 @@ namespace coursework::protocol
     {
         QString clientUuid;
         QString fileName;
-        QString fileData;
+        QByteArray fileData;
     };
 
     struct Payload

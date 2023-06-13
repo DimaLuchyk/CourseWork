@@ -6,6 +6,8 @@
 #include <QThread>
 #include <memory>
 
+#include <thread>
+
 class ClientHandler : public QThread
 {
 public:
@@ -46,7 +48,13 @@ public:
 public slots:
     void handleClientPacket()
     {
-        QByteArray packet = m_socket->readAll();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        QByteArray packet;
+        while (m_socket->bytesAvailable() > 0) {
+            packet.append(m_socket->readAll());
+        }
+
+        qDebug() << "packet size: " << packet.size();
         m_socket->write(m_packetProcessor->handlePacket(packet));
     }
 

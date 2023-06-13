@@ -22,7 +22,6 @@ namespace coursework
 
         ~NetworkClient()
         {
-            qDebug() << "~NetworkClient";
             if(m_socket->isOpen())
             {
                 m_socket->close();
@@ -65,7 +64,7 @@ namespace coursework
         {
             if(m_socket->isOpen())
             {
-                m_socket->write(data);
+                qDebug() << "wrote: " << m_socket->write(data);
                 return;
             }
             else
@@ -137,6 +136,14 @@ namespace coursework
                     stream >> payload.payload;
 
                     emit receievedExistedFiles(payload.payload);
+                }
+                else if(header->packetType == coursework::protocol::PacketType::ADD_FILE_FAILURE)
+                {
+                    qDebug() << "ADD_FILE_FAILURE";
+                }
+                else if(header->packetType ==coursework::protocol::PacketType::ADD_FILE_SUCCESS)
+                {
+                    qDebug() << "ADD_FILE_SUCCESS";
                 }
 
                 return packet;

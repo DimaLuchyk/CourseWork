@@ -12,7 +12,7 @@ find_package(Qt5 COMPONENTS
         Sql
         REQUIRED)
 
-add_executable(Server main.cpp src/Server.cpp src/DatabaseController.cpp inc/DatabaseController.h inc/Shared.h inc/PacketProcessor/PacketProcessor.h src/PacketProcessor/PacketProcessor.cpp inc/PacketProcessor/Tasks.h src/PacketProcessor/Tasks.cpp)
+add_executable(Server main.cpp src/Server.cpp src/DatabaseController.cpp inc/DatabaseController.h inc/Shared.h inc/PacketProcessor/PacketProcessor.h src/PacketProcessor/PacketProcessor.cpp inc/PacketProcessor/Tasks.h src/PacketProcessor/Tasks.cpp inc/FileManager.h src/FileManager.cpp)
 
 include_directories(inc)
 include_directories(../../3rdparty/plog/include)

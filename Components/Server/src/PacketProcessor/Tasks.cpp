@@ -1,8 +1,11 @@
 #include "PacketProcessor/Tasks.h"
 #include "Shared.h"
 #include "plog/Log.h"
+#include "FileManager.h"
 
 #include <QUuid>
+
+#define DEFAULT_PATH "/home/dany/server/files"
 
 coursework::protocol::ITask::ITask(DatabaseController *dbController)
     :
@@ -118,9 +121,12 @@ QByteArray coursework::protocol::GetExistedFilesTask::perform()
     return PacketGenerator::combineToPacket(header, payload);
 }
 
-coursework::protocol::AddFileTask::AddFileTask(DatabaseController* dbController)
+coursework::protocol::AddFileTask::AddFileTask(const QString& fileName, const QByteArray& fileData, const QUuid& userId, DatabaseController* dbController)
     :
-    ITask(dbController)
+    ITask(dbController),
+    m_fileName(fileName),
+    m_fileData(fileData),
+    m_userId(userId)
 {
     PLOG_DEBUG << "ctor";
 }
@@ -133,5 +139,23 @@ coursework::protocol::AddFileTask::~AddFileTask()
 QByteArray coursework::protocol::AddFileTask::perform()
 {
     PLOG_DEBUG << "perform";
-   // m_dbController->addFile()
+
+    QUuid uuid = QUuid::createUuid();
+    m_dbController->addFile(uuid, m_fileName, DEFAULT_PATH, m_userId.toString());
+
+    if(managers::FileManager::createFile(m_fileName, DEFAULT_PATH, m_fileData))
+    {
+        PLOG_INFO << m_fileName  << " file, was successfully added to the server";
+
+        Payload payload{m_fileName + "was added to the server"};
+        auto header = coursework::protocol::PacketGenerator::generatePacketHeader(PacketType::ADD_FILE_SUCCESS, sizeof(payload));
+
+        return coursework::protocol::PacketGenerator::combineToPacket(header, payload);
+    }
+
+    PLOG_WARNING << m_fileName << " file, was not added to the server";
+    Payload payload{m_fileName + "failed to add to the server"};
+    auto header = coursework::protocol::PacketGenerator::generatePacketHeader(PacketType::ADD_FILE_FAILURE, sizeof(payload));
+
+    return coursework::protocol::PacketGenerator::combineToPacket(header, payload);
 }

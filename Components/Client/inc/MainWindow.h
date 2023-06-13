@@ -154,9 +154,13 @@ namespace coursework::windows
                 coursework::protocol::FilePaylaod payload;
                 payload.clientUuid = m_client->getId().toString();
                 QFileInfo fileInfo(filePath);
+                qDebug() << "fileSize:" << fileInfo.size();
                 payload.fileName = fileInfo.fileName();
-                qDebug() << payload.fileName;
                 payload.fileData = file.readAll();
+
+                qDebug() << "fileSize in payload: " << payload.fileData.size();
+                qDebug() << "payload size: " << sizeof(payload);
+
                 auto header = coursework::protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::ADD_FILE, sizeof(payload));
                 m_client->sendData(coursework::protocol::PacketGenerator::combineToPacket(header, payload));
             }

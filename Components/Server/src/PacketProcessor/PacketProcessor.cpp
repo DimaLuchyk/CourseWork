@@ -63,7 +63,21 @@ QByteArray coursework::protocol::PacketProcessor::handlePacket(QByteArray& packe
     }
     else if(header->packetType == PacketType::ADD_FILE)
     {
-       // task = std::make_shared<AddFileTask>();
+        qDebug() << "packet size: " << packet.size();
+
+        FilePaylaod payload;
+
+        QDataStream stream(&packet, QIODevice::ReadOnly);
+        stream.readRawData(reinterpret_cast<char*>(header), sizeof(PacketHeader));
+        stream >> payload.clientUuid;
+        stream >> payload.fileName;
+        stream >> payload.fileData;
+
+        qDebug() << "pyaload size: " << sizeof(payload);
+        qDebug() << "size: " << payload.fileData.size();
+
+        //task = std::make_shared<TempTask>(m_dbController);
+        //task = std::make_shared<AddFileTask>(payload.fileName, payload.fileData, QUuid(payload.clientUuid), m_dbController);
     }
     else
     {
