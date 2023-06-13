@@ -58,6 +58,13 @@ namespace coursework::protocol
         QString password;
     };
 
+    struct FilePaylaod
+    {
+        QString clientUuid;
+        QString fileName;
+        QString fileData;
+    };
+
     struct Payload
     {
         QString payload;
@@ -78,6 +85,18 @@ namespace coursework::protocol
             QDataStream stream(&packet, QIODevice::WriteOnly);
             stream.writeRawData(reinterpret_cast<const char*>(&header), sizeof(PacketHeader));
             stream << payload.payload;
+
+            return packet;
+        }
+
+        static QByteArray combineToPacket(const PacketHeader& header, const FilePaylaod& payload)
+        {
+            QByteArray packet;
+            QDataStream stream(&packet, QIODevice::WriteOnly);
+            stream.writeRawData(reinterpret_cast<const char*>(&header), sizeof(PacketHeader));
+            stream << payload.clientUuid;
+            stream << payload.fileName;
+            stream << payload.fileData;
 
             return packet;
         }

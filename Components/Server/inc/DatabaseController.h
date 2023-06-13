@@ -7,6 +7,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QUuid>
+#include <QList>
 
 
 class DatabaseController : public QObject
@@ -26,6 +27,8 @@ public:
     void addUser(const QUuid& uuid, const QString& userName, const QString& password);
     QUuid userExist(const QString& userName);
     QUuid checkUserCredentials(const QString& userName, const QString& password);
+
+    QList<QString> getExistedFiles();
 
     void addFile(const QUuid& uuid, const QString& fileName, const QString& filePath, const QString& userId);
     //void removeFile();

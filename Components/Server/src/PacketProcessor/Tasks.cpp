@@ -66,9 +66,10 @@ QByteArray coursework::protocol::LogInTask::perform()
 {
     PLOG_DEBUG << "perform";
 
-    if(!m_dbController->checkUserCredentials(m_userName, m_password).isNull())
+    auto clientUuid = m_dbController->checkUserCredentials(m_userName, m_password);
+    if(!clientUuid.isNull())
     {
-        Payload payload{"The user was found"};
+        Payload payload{clientUuid.toString()};
         PacketHeader header = PacketGenerator::generatePacketHeader(PacketType::LOG_IN_SUCCESS, sizeof(payload));
 
         return PacketGenerator::combineToPacket(header, payload);
@@ -80,3 +81,57 @@ QByteArray coursework::protocol::LogInTask::perform()
     return PacketGenerator::combineToPacket(header, payload);
 }
 
+
+coursework::protocol::GetExistedFilesTask::GetExistedFilesTask(DatabaseController* dbController)
+    :
+    ITask(dbController)
+{
+    PLOG_DEBUG << "ctor";
+}
+
+coursework::protocol::GetExistedFilesTask::~GetExistedFilesTask()
+{
+    PLOG_DEBUG << "dtor";
+}
+
+QByteArray coursework::protocol::GetExistedFilesTask::perform()
+{
+    PLOG_DEBUG << "perform";
+
+    const auto files = m_dbController->getExistedFiles();
+    if(!files.isEmpty())
+    {
+        Payload payload;
+        for (const auto& file : files)
+        {
+            payload.payload += file + "|"; // use '|' as a delimeter
+        }
+
+        auto header = PacketGenerator::generatePacketHeader(PacketType::GET_EXISTED_FILES_SUCCESS, sizeof(payload));
+
+        return PacketGenerator::combineToPacket(header, payload);
+    }
+
+    Payload payload{"failed to receive existed files"};
+    auto header = PacketGenerator::generatePacketHeader(PacketType::GET_EXISTED_FILES_FAILURE, sizeof(payload));
+
+    return PacketGenerator::combineToPacket(header, payload);
+}
+
+coursework::protocol::AddFileTask::AddFileTask(DatabaseController* dbController)
+    :
+    ITask(dbController)
+{
+    PLOG_DEBUG << "ctor";
+}
+
+coursework::protocol::AddFileTask::~AddFileTask()
+{
+    PLOG_DEBUG << "dtor";
+}
+
+QByteArray coursework::protocol::AddFileTask::perform()
+{
+    PLOG_DEBUG << "perform";
+   // m_dbController->addFile()
+}

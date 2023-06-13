@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <QUuid>
 
 #include "../../Server/inc/Shared.h"
 
@@ -21,6 +22,7 @@ namespace coursework
 
         ~NetworkClient()
         {
+            qDebug() << "~NetworkClient";
             if(m_socket->isOpen())
             {
                 m_socket->close();
@@ -32,6 +34,16 @@ namespace coursework
             return m_socket;
         }
 
+        const QUuid& getId()
+        {
+            return m_uuid;
+        }
+
+        void setId(const QUuid& id)
+        {
+            m_uuid = id;
+        }
+
         bool connectToServer(const QString& ip, const std::uint16_t port)
         {
             m_port = port;
@@ -39,6 +51,7 @@ namespace coursework
 
             m_socket = new QTcpSocket(this);
             QObject::connect(m_socket, &QTcpSocket::readyRead, this, &NetworkClient::readTcpData);
+
             m_socket->connectToHost(m_ip, m_port);
             if(m_socket->waitForConnected())
             {
@@ -77,6 +90,8 @@ namespace coursework
                     stream.readRawData(reinterpret_cast<char *>(header), sizeof(coursework::protocol::PacketHeader));
                     stream >> payload.payload;
 
+                    setId(QUuid(payload.payload));
+
                     emit loggedIn();
                 }
                 else if(header->packetType == coursework::protocol::PacketType::LOG_IN_FAILURE)
@@ -109,6 +124,20 @@ namespace coursework
 
                     emit failedToLogUp(payload.payload);
                 }
+                else if(header->packetType == coursework::protocol::PacketType::GET_EXISTED_FILES_FAILURE)
+                {
+                    qDebug() << "GET_EXISTED_FILES_FAILURE";
+                }
+                else if(header->packetType == coursework::protocol::PacketType::GET_EXISTED_FILES_SUCCESS)
+                {
+                    coursework::protocol::Payload payload;
+
+                    QDataStream stream(&packet, QIODevice::ReadOnly);
+                    stream.readRawData(reinterpret_cast<char* >(header), sizeof(coursework::protocol::PacketHeader));
+                    stream >> payload.payload;
+
+                    emit receievedExistedFiles(payload.payload);
+                }
 
                 return packet;
             }
@@ -119,8 +148,10 @@ namespace coursework
         void loggedUp(const QString& status);
         void failedToLogIn(const QString& status);
         void failedToLogUp(const QString& status);
+        void receievedExistedFiles(const QString& files);
 
     private:
+        QUuid m_uuid;
         QTcpSocket* m_socket;
         QString m_ip;
         std::uint16_t m_port = 0;

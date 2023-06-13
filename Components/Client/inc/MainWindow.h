@@ -11,7 +11,7 @@
 #include <QStyledItemDelegate>
 #include <QPainter>
 #include <QApplication>
-
+#include <QList>
 
 
 
@@ -96,44 +96,37 @@ namespace coursework::windows
     Q_OBJECT
 
     public:
-        MainWindow(std::shared_ptr<NetworkClient> client, QWidget *parent = nullptr) : QWidget(parent)
+        MainWindow(std::shared_ptr<NetworkClient> client, QWidget *parent = nullptr) : QWidget(parent), m_client(client)
         {
-            fileListWidget = new QListWidget(this);
-            downloadButton = new QPushButton("Download", this);
-            uploadButton = new QPushButton("Upload", this);
+            m_fileListWidget = new QListWidget(this);
+            m_downloadButton = new QPushButton("Download", this);
+            m_uploadButton = new QPushButton("Upload", this);
+            m_updateButton = new QPushButton("Update", this);
 
             // Connect button signals to slots
-            connect(downloadButton, &QPushButton::clicked, this, &MainWindow::downloadFile);
-            connect(uploadButton, &QPushButton::clicked, this, &MainWindow::uploadFile);
+            connect(m_downloadButton, &QPushButton::clicked, this, &MainWindow::downloadFileRequest);
+            connect(m_uploadButton, &QPushButton::clicked, this, &MainWindow::uploadFileRequest);
+            connect(m_updateButton, &QPushButton::clicked, this, &MainWindow::updateFilesRequest);
 
             // Set the layout
             QVBoxLayout *layout = new QVBoxLayout(this);
-            layout->addWidget(fileListWidget);
-            layout->addWidget(downloadButton);
-            layout->addWidget(uploadButton);
+            layout->addWidget(m_fileListWidget);
+            layout->addWidget(m_downloadButton);
+            layout->addWidget(m_uploadButton);
+            layout->addWidget(m_updateButton);
 
             setLayout(layout);
 
-            CustomItemDelegate* itemDelegate = new CustomItemDelegate(fileListWidget);
-            fileListWidget->setItemDelegate(itemDelegate);
+            CustomItemDelegate* itemDelegate = new CustomItemDelegate(m_fileListWidget);
+            m_fileListWidget->setItemDelegate(itemDelegate);
 
-            // Add custom items to the list widget
-            CustomItem* item1 = new CustomItem("File1.txt", 1024, "Text");
-            fileListWidget->addItem(item1);
-
-            CustomItem* item2 = new CustomItem("Image.png", 2048, "Image");
-            fileListWidget->addItem(item2);
-
-
-
-           // addFileToList("/home/dany/Documents/MyFiles/Programming/DataBaseTest/main.cpp");
         }
 
     private slots:
-        void downloadFile()
+        void downloadFileRequest()
         {
             // Retrieve the selected file from the list
-            QListWidgetItem *selectedItem = fileListWidget->currentItem();
+            QListWidgetItem *selectedItem = m_fileListWidget->currentItem();
             if (selectedItem)
             {
                 QString selectedFile = selectedItem->text();
@@ -142,33 +135,83 @@ namespace coursework::windows
             }
         }
 
-        void uploadFile()
+        void uploadFileRequest()
         {
             // Open a file dialog for selecting files to upload
             QStringList selectedFiles = QFileDialog::getOpenFileNames(this, "Select Files to Upload");
             // Process the selected files
-            for (const QString &file : selectedFiles)
+            for (const QString &filePath : selectedFiles)
             {
-                // Perform upload operation for each file
+                QFile file(filePath);
+                if(!file.open(QIODevice::ReadOnly))
+                {
+                    qDebug() << "Failed to open file. Filename: " << filePath;
+                    continue;
+                }
+
                 qDebug() << "Uploading file: " << file;
+
+                coursework::protocol::FilePaylaod payload;
+                payload.clientUuid = m_client->getId().toString();
+                QFileInfo fileInfo(filePath);
+                payload.fileName = fileInfo.fileName();
+                qDebug() << payload.fileName;
+                payload.fileData = file.readAll();
+                auto header = coursework::protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::ADD_FILE, sizeof(payload));
+                m_client->sendData(coursework::protocol::PacketGenerator::combineToPacket(header, payload));
+            }
+        }
+
+        void updateFilesRequest()
+        {
+            protocol::Payload payload;
+            auto header = protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::GET_EXISTED_FILES, sizeof(payload));
+
+            m_client->sendData(protocol::PacketGenerator::combineToPacket(header, payload));
+        }
+
+    public slots:
+
+        void updateFiles(const QString& files)
+        {
+            qDebug() << "updateFiles" << files;
+            QStringList fileNames;
+
+            // Parse the packet to extract individual file names
+            QString delimiter = "|"; // Delimiter used to separate file names
+            int startIndex = 0;
+            int delimiterIndex = files.indexOf(delimiter, startIndex);
+
+            while (delimiterIndex != -1)
+            {
+                QString fileName = files.mid(startIndex, delimiterIndex - startIndex);
+                fileNames.append(fileName);
+
+                startIndex = delimiterIndex + delimiter.size();
+                delimiterIndex = files.indexOf(delimiter, startIndex);
+            }
+
+            for(const auto& file : fileNames)
+            {
+                addFileToList(file);
             }
         }
 
     private:
         void addFileToList(const QString &filePath)
         {
-
             // Create a QListWidgetItem for the file
             QListWidgetItem *item = new QListWidgetItem(QFileInfo(filePath).fileName());
-            item->setToolTip(" bytes");
-
-            fileListWidget->addItem(item);
+            m_fileListWidget->addItem(item);
         }
 
     private:
-        QListWidget *fileListWidget;
-        QPushButton *downloadButton;
-        QPushButton *uploadButton;
+        QList<QString> m_files;
+
+        QListWidget * m_fileListWidget;
+        QPushButton * m_downloadButton;
+        QPushButton * m_uploadButton;
+        QPushButton * m_updateButton;
 
         std::shared_ptr<NetworkClient> m_client;
     };

@@ -84,7 +84,7 @@ void DatabaseController::addFile(const QUuid& uuid, const QString& fileName, con
 {
     if(!m_database.isOpen())
     {
-        qDebug() << "addFile failed to execute. database connection is not opened!\n";
+        PLOG_ERROR << "Database connection is not opened";
         return;
     }
 
@@ -97,11 +97,11 @@ void DatabaseController::addFile(const QUuid& uuid, const QString& fileName, con
 
     if (query.exec())
     {
-        qDebug() << "Data inserted successfully\n";
+        PLOG_INFO << "Data inserted successfully";
     }
     else
     {
-        qDebug() << "Failed to insert data:" << query.lastError().text() + "\n";
+        PLOG_WARNING << "Failed to insert data:" << query.lastError().text();
     }
 }
 
@@ -152,7 +152,34 @@ QUuid DatabaseController::checkUserCredentials(const QString& userName, const QS
     return QUuid();
 }
 
+QList<QString> DatabaseController::getExistedFiles()
+{
+    if(!m_database.isOpen())
+    {
+        PLOG_ERROR << "Database connection is not opened";
+        return {};
+    }
 
+    QList<QString> files;
+
+    // Execute a query to fetch the file names
+    QSqlQuery query;
+    query.prepare("SELECT file_name FROM files");
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            files.append(query.value("file_name").toString());
+        }
+        return files;
+    }
+    else
+    {
+        PLOG_WARNING << "Failed to execute query: " << query.lastError().text();
+        return {};
+    }
+}
 
 bool DatabaseController::fileExist(const QString& fileName, const QString& filePath, const QString& userId)
 {

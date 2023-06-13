@@ -57,6 +57,14 @@ QByteArray coursework::protocol::PacketProcessor::handlePacket(QByteArray& packe
 
         task = std::make_shared<LogUpTask>(payload.username, payload.password, m_dbController);
     }
+    else if(header->packetType == PacketType::GET_EXISTED_FILES)
+    {
+        task = std::make_shared<GetExistedFilesTask>(m_dbController);
+    }
+    else if(header->packetType == PacketType::ADD_FILE)
+    {
+       // task = std::make_shared<AddFileTask>();
+    }
     else
     {
         PLOG_WARNING << "UNKNOWN PacketType received. PacketType: " << header->packetType;

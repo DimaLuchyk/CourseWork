@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     QObject::connect(connectionWindow.get(), &coursework::windows::ConnectionWindow::connectedToServer, connectionWindow.get(), &coursework::windows::ConnectionWindow::hide);
     QObject::connect(client.get(), &coursework::NetworkClient::loggedIn, authorizationWindow.get(), &coursework::windows::AuthorizationWindow::hide);
     QObject::connect(client.get(), &coursework::NetworkClient::loggedIn, mainWindow.get(), &coursework::windows::MainWindow::show);
-
+    QObject::connect(client.get(), &coursework::NetworkClient::receievedExistedFiles, mainWindow.get(), &coursework::windows::MainWindow::updateFiles);
     //client->connect("127.0.0.1", 9999);
 
     //coursework::protocol::AuthorizationPayload payload{"Dmytro", "Luchyk"};

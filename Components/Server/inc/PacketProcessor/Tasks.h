@@ -54,7 +54,25 @@ namespace coursework::protocol
 
     };
 
-    //other
+    class GetExistedFilesTask : public ITask
+    {
+    public:
+        GetExistedFilesTask(DatabaseController* dbController);
+        ~GetExistedFilesTask();
+
+        QByteArray perform() override;
+
+    private:
+    };
+
+    class AddFileTask : public ITask
+    {
+    public:
+        AddFileTask(DatabaseController* dbController);
+        ~AddFileTask();
+
+        QByteArray perform() override;
+    };
 }
 
 #endif
