@@ -31,8 +31,8 @@ public:
     QList<QString> getExistedFiles();
 
     void addFile(const QUuid& uuid, const QString& fileName, const QString& filePath, const QString& userId);
-    //void removeFile();
-    bool fileExist(const QString& fileName, const QString& filePath, const QString& userId);
+    bool removeFile(const QString& fileName, const QString& filePath);
+    bool fileExist(const QString& fileName, const QString& filePath);
 
 public slots:
 

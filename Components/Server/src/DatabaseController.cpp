@@ -181,19 +181,42 @@ QList<QString> DatabaseController::getExistedFiles()
     }
 }
 
-bool DatabaseController::fileExist(const QString& fileName, const QString& filePath, const QString& userId)
+bool DatabaseController::removeFile(const QString& fileName, const QString& filePath)
 {
     if(!m_database.isOpen())
     {
-        qDebug() << "addFile failed to execute. database connection is not opened!\n";
+        PLOG_ERROR << "Database connection is not opened";
         return false;
     }
 
     QSqlQuery query;
-    query.prepare("SELECT COUNT(*) FROM files WHERE file_name = :fileName AND file_path = :filePath AND user_id = :userId");
+    query.prepare("DELETE FROM files WHERE file_name = :fileName AND file_path = :filePath");
     query.bindValue(":fileName", fileName);
     query.bindValue(":filePath", filePath);
-    query.bindValue(":userId", userId);
+
+    // Execute the query
+    if (query.exec())
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool DatabaseController::fileExist(const QString& fileName, const QString& filePath)
+{
+    if(!m_database.isOpen())
+    {
+        PLOG_ERROR << "Database connection is not opened";
+        return false;
+    }
+
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM files WHERE file_name = :fileName AND file_path = :filePath");
+    query.bindValue(":fileName", fileName);
+    query.bindValue(":filePath", filePath);
+
+    qDebug() << "name: " << fileName << " filePath: " << filePath;
 
     if (query.exec() && query.next())
     {
@@ -207,7 +230,7 @@ bool DatabaseController::fileExist(const QString& fileName, const QString& fileP
     }
     else
     {
-        qDebug() << "Failed to execute query:" << query.lastError().text();
+        PLOG_WARNING << "Failed to execute query: " << query.lastError().text();
         return false;
     }
 }

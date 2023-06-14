@@ -102,11 +102,13 @@ namespace coursework::windows
             m_downloadButton = new QPushButton("Download", this);
             m_uploadButton = new QPushButton("Upload", this);
             m_updateButton = new QPushButton("Update", this);
+            m_deleteButton = new QPushButton("Delete", this);
 
             // Connect button signals to slots
             connect(m_downloadButton, &QPushButton::clicked, this, &MainWindow::downloadFileRequest);
             connect(m_uploadButton, &QPushButton::clicked, this, &MainWindow::uploadFileRequest);
             connect(m_updateButton, &QPushButton::clicked, this, &MainWindow::updateFilesRequest);
+            connect(m_deleteButton, &QPushButton::clicked, this, &MainWindow::deleteFileRequest);
 
             // Set the layout
             QVBoxLayout *layout = new QVBoxLayout(this);
@@ -114,6 +116,7 @@ namespace coursework::windows
             layout->addWidget(m_downloadButton);
             layout->addWidget(m_uploadButton);
             layout->addWidget(m_updateButton);
+            layout->addWidget(m_deleteButton);
 
             setLayout(layout);
 
@@ -131,7 +134,20 @@ namespace coursework::windows
             {
                 QString selectedFile = selectedItem->text();
                 // Perform download operation for the selected file
-                qDebug() << "Downloading file: " << selectedFile;
+                QString saveLocation = QFileDialog::getSaveFileName(nullptr, "Save File", selectedFile);
+                if (saveLocation.isEmpty())
+                {
+                    return;
+                }
+
+                qDebug() << "file location: " << saveLocation;
+
+                m_currentFile = saveLocation;
+
+                coursework::protocol::Payload payload{selectedFile};
+                auto header = coursework::protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::DOWNLOAD_FILE, sizeof(payload));
+
+                m_client->sendData(coursework::protocol::PacketGenerator::combineToPacket(header, payload));
             }
         }
 
@@ -154,12 +170,8 @@ namespace coursework::windows
                 coursework::protocol::FilePaylaod payload;
                 payload.clientUuid = m_client->getId().toString();
                 QFileInfo fileInfo(filePath);
-                qDebug() << "fileSize:" << fileInfo.size();
                 payload.fileName = fileInfo.fileName();
                 payload.fileData = file.readAll();
-
-                qDebug() << "fileSize in payload: " << payload.fileData.size();
-                qDebug() << "payload size: " << sizeof(payload);
 
                 auto header = coursework::protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::ADD_FILE, sizeof(payload));
                 m_client->sendData(coursework::protocol::PacketGenerator::combineToPacket(header, payload));
@@ -172,6 +184,23 @@ namespace coursework::windows
             auto header = protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::GET_EXISTED_FILES, sizeof(payload));
 
             m_client->sendData(protocol::PacketGenerator::combineToPacket(header, payload));
+        }
+
+        void deleteFileRequest()
+        {
+            // Retrieve the selected file from the list
+            QListWidgetItem *selectedItem = m_fileListWidget->currentItem();
+            if (selectedItem)
+            {
+                QString selectedFile = selectedItem->text();
+
+                qDebug() << "file to delete: " << selectedFile;
+
+                coursework::protocol::Payload payload{selectedFile};
+                auto header = coursework::protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::REMOVE_FILE, sizeof(payload));
+
+                m_client->sendData(coursework::protocol::PacketGenerator::combineToPacket(header, payload));
+            }
         }
 
     public slots:
@@ -195,9 +224,25 @@ namespace coursework::windows
                 delimiterIndex = files.indexOf(delimiter, startIndex);
             }
 
+            m_fileListWidget->clear();
+
             for(const auto& file : fileNames)
             {
                 addFileToList(file);
+            }
+        }
+
+        void saveDownloadedFile(QByteArray fileData)
+        {
+            qDebug() << "saveDownloadedFile";
+
+            QFile file(m_currentFile);
+            if (file.open(QIODevice::WriteOnly))
+            {
+                file.write(fileData);
+                file.close();
+
+                qDebug() << "File was saved!";
             }
         }
 
@@ -216,6 +261,9 @@ namespace coursework::windows
         QPushButton * m_downloadButton;
         QPushButton * m_uploadButton;
         QPushButton * m_updateButton;
+        QPushButton * m_deleteButton;
+
+        QString m_currentFile; //used to save the path to the file that we are going to download
 
         std::shared_ptr<NetworkClient> m_client;
     };

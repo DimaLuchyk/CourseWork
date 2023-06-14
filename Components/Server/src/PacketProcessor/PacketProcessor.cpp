@@ -63,8 +63,6 @@ QByteArray coursework::protocol::PacketProcessor::handlePacket(QByteArray& packe
     }
     else if(header->packetType == PacketType::ADD_FILE)
     {
-        qDebug() << "packet size: " << packet.size();
-
         FilePaylaod payload;
 
         QDataStream stream(&packet, QIODevice::ReadOnly);
@@ -73,11 +71,29 @@ QByteArray coursework::protocol::PacketProcessor::handlePacket(QByteArray& packe
         stream >> payload.fileName;
         stream >> payload.fileData;
 
-        qDebug() << "pyaload size: " << sizeof(payload);
-        qDebug() << "size: " << payload.fileData.size();
+        task = std::make_shared<AddFileTask>(payload.fileName, payload.fileData, QUuid(payload.clientUuid), m_dbController);
+    }
+    else if(header->packetType == PacketType::DOWNLOAD_FILE)
+    {
+        Payload payload;
 
-        //task = std::make_shared<TempTask>(m_dbController);
-        //task = std::make_shared<AddFileTask>(payload.fileName, payload.fileData, QUuid(payload.clientUuid), m_dbController);
+        QDataStream stream(&packet, QIODevice::ReadOnly);
+        stream.readRawData(reinterpret_cast<char*>(header), sizeof(PacketHeader));
+        stream >> payload.payload;
+
+        task = std::make_shared<DownloadFileTask>(payload.payload, m_dbController);
+    }
+    else if(header->packetType == PacketType::REMOVE_FILE)
+    {
+        Payload payload;
+
+        QDataStream stream(&packet, QIODevice::ReadOnly);
+        stream.readRawData(reinterpret_cast<char*>(header), sizeof(PacketHeader));
+        stream >> payload.payload;
+
+        qDebug() << "fileName: " << payload.payload;
+
+        task = std::make_shared<RemoveFileTask>(payload.payload, m_dbController);
     }
     else
     {

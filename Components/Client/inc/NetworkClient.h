@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QUuid>
+#include <QFile>
+
 
 #include "../../Server/inc/Shared.h"
 
@@ -79,9 +81,9 @@ namespace coursework
             if(m_socket->isOpen())
             {
                 auto packet = m_socket->readAll();
-                coursework::protocol::PacketHeader* header = reinterpret_cast<coursework::protocol::PacketHeader*>(packet.data());
+                coursework::protocol::PacketHeader *header = reinterpret_cast<coursework::protocol::PacketHeader *>(packet.data());
 
-                if(header->packetType == coursework::protocol::PacketType::LOG_IN_SUCCESS)
+                if (header->packetType == coursework::protocol::PacketType::LOG_IN_SUCCESS)
                 {
                     coursework::protocol::Payload payload;
 
@@ -93,7 +95,7 @@ namespace coursework
 
                     emit loggedIn();
                 }
-                else if(header->packetType == coursework::protocol::PacketType::LOG_IN_FAILURE)
+                else if (header->packetType == coursework::protocol::PacketType::LOG_IN_FAILURE)
                 {
                     coursework::protocol::Payload payload;
 
@@ -103,7 +105,7 @@ namespace coursework
 
                     emit failedToLogIn(payload.payload);
                 }
-                else if(header->packetType == coursework::protocol::PacketType::LOG_UP_SUCCESS)
+                else if (header->packetType == coursework::protocol::PacketType::LOG_UP_SUCCESS)
                 {
                     coursework::protocol::Payload payload;
 
@@ -113,7 +115,7 @@ namespace coursework
 
                     emit loggedUp(payload.payload);
                 }
-                else if(header->packetType == coursework::protocol::PacketType::LOG_UP_FAILURE)
+                else if (header->packetType == coursework::protocol::PacketType::LOG_UP_FAILURE)
                 {
                     coursework::protocol::Payload payload;
 
@@ -123,29 +125,53 @@ namespace coursework
 
                     emit failedToLogUp(payload.payload);
                 }
-                else if(header->packetType == coursework::protocol::PacketType::GET_EXISTED_FILES_FAILURE)
+                else if (header->packetType == coursework::protocol::PacketType::GET_EXISTED_FILES_FAILURE)
                 {
                     qDebug() << "GET_EXISTED_FILES_FAILURE";
                 }
-                else if(header->packetType == coursework::protocol::PacketType::GET_EXISTED_FILES_SUCCESS)
+                else if (header->packetType == coursework::protocol::PacketType::GET_EXISTED_FILES_SUCCESS)
                 {
                     coursework::protocol::Payload payload;
 
                     QDataStream stream(&packet, QIODevice::ReadOnly);
-                    stream.readRawData(reinterpret_cast<char* >(header), sizeof(coursework::protocol::PacketHeader));
+                    stream.readRawData(reinterpret_cast<char * >(header), sizeof(coursework::protocol::PacketHeader));
                     stream >> payload.payload;
 
                     emit receievedExistedFiles(payload.payload);
                 }
-                else if(header->packetType == coursework::protocol::PacketType::ADD_FILE_FAILURE)
+                else if (header->packetType == coursework::protocol::PacketType::ADD_FILE_FAILURE)
                 {
                     qDebug() << "ADD_FILE_FAILURE";
                 }
-                else if(header->packetType ==coursework::protocol::PacketType::ADD_FILE_SUCCESS)
+                else if (header->packetType == coursework::protocol::PacketType::ADD_FILE_SUCCESS)
                 {
                     qDebug() << "ADD_FILE_SUCCESS";
                 }
+                else if (header->packetType == coursework::protocol::PacketType::DOWNLOAD_FILE_SUCCESS)
+                {
+                    coursework::protocol::FilePaylaod payload;
 
+                    QDataStream stream(&packet, QIODevice::ReadOnly);
+                    stream.readRawData(reinterpret_cast<char *>(header), sizeof(coursework::protocol::PacketHeader));
+                    stream >> payload.clientUuid;
+                    stream >> payload.fileName;
+                    stream >> payload.fileData;
+
+                    emit fileDownloaded(payload.fileData);
+
+                }
+                else if (header->packetType == coursework::protocol::PacketType::DOWNLOAD_FILE_FAILURE)
+                {
+                    qDebug() << "DOWNLOAD_FILE_FAILURE";
+                }
+                else if (header->packetType == coursework::protocol::PacketType::REMOVE_FILE_SUCCESS)
+                {
+                    qDebug() << "REMOVE_FILE_SUCCESS";
+                }
+                else if (header->packetType == coursework::protocol::PacketType::REMOVE_FILE_FAILURE)
+                {
+                    qDebug() << "REMOVE_FILE_FAILURE";
+                }
                 return packet;
             }
         }
@@ -156,6 +182,7 @@ namespace coursework
         void failedToLogIn(const QString& status);
         void failedToLogUp(const QString& status);
         void receievedExistedFiles(const QString& files);
+        void fileDownloaded(QByteArray fileData);
 
     private:
         QUuid m_uuid;

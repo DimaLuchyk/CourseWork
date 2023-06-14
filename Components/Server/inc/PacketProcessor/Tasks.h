@@ -95,6 +95,30 @@ namespace coursework::protocol
         QString m_fileName;
         QUuid m_userId;
     };
+
+    class DownloadFileTask : public ITask
+    {
+    public:
+        DownloadFileTask(const QString& fileName, DatabaseController* dbController);
+        ~DownloadFileTask();
+
+        QByteArray perform() override;
+
+    private:
+        QString m_fileName;
+    };
+
+    class RemoveFileTask : public ITask
+    {
+    public:
+        RemoveFileTask(const QString& fileName, DatabaseController* dbContorller);
+        ~RemoveFileTask();
+
+        QByteArray perform() override;
+
+    private:
+        QString m_fileName;
+    };
 }
 
 #endif
