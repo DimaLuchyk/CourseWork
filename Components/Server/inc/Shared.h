@@ -71,7 +71,7 @@ namespace coursework::protocol
     };
 
 
-    class PacketGenerator
+    /*class PacketGenerator
     {
     public:
         static PacketHeader generatePacketHeader(const PacketType packetType, const std::uint32_t payloadLength)
@@ -117,7 +117,7 @@ namespace coursework::protocol
         {
             return QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
         }
-    };
+    };*/
 
 }
 

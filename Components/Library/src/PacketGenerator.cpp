@@ -1,7 +1,16 @@
 #include "PacketGenerator.h"
-#include <QDebug>
+#include <QDataStream>
+#include <QDateTime>
 
-void test()
+using namespace coursework::protocol;
+
+
+PacketHeader PacketGenerator::generatePacketHeader(const PacketType packetType, const std::uint32_t payloadLength)
 {
-    qDebug() << "Hello";
+    return {STARTOFPACKET, 0, packetType, generateTimeStamp(), payloadLength};
+}
+
+QString PacketGenerator::generateTimeStamp()
+{
+    return QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
 }

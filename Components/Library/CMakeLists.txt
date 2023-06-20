@@ -13,7 +13,7 @@ find_package(Qt5 COMPONENTS
         REQUIRED)
 
 set(SOURCES src/PacketGenerator.cpp)
-set(HEADERS inc/PacketGenerator.h inc/Packet.h)
+set(HEADERS inc/PacketGenerator.h inc/Packet.h inc/Serializer.h src/Serializer.cpp)
 
 include_directories(inc)
 
