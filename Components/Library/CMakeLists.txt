@@ -12,8 +12,8 @@ find_package(Qt5 COMPONENTS
         Sql
         REQUIRED)
 
-set(SOURCES src/PacketGenerator.cpp)
-set(HEADERS inc/PacketGenerator.h inc/Packet.h inc/Serializer.h src/Serializer.cpp)
+set(SOURCES src/PacketGenerator.cpp src/Serializer.cpp)
+set(HEADERS inc/PacketGenerator.h inc/Packet.h inc/Serializer.h)
 
 include_directories(inc)
 
