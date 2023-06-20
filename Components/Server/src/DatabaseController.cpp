@@ -15,7 +15,7 @@ DatabaseController::DatabaseController(const QString& host, const std::uint16_t 
 {
     PLOG_DEBUG << "DatabaseController ctor";
 
-    m_database = QSqlDatabase::addDatabase("QPSQL");
+    m_database = QSqlDatabase::addDatabase("QPSQL", QUuid::createUuid().toString());
     m_database.setHostName(m_host);
     m_database.setPort(m_port);
     m_database.setDatabaseName(m_databaseName);
@@ -88,7 +88,7 @@ void DatabaseController::addFile(const QUuid& uuid, const QString& fileName, con
         return;
     }
 
-    QSqlQuery query;
+    QSqlQuery query(m_database);
     query.prepare("INSERT INTO files (file_id, file_name, file_path, user_id) VALUES (:fileid, :filename, :filepath, :userid)");
     query.bindValue(":fileid", uuid.toString());
     query.bindValue(":filename", fileName);
@@ -113,7 +113,7 @@ QUuid DatabaseController::userExist(const QString& userName)
         return QUuid{};
     }
 
-    QSqlQuery query;
+    QSqlQuery query(m_database);
     query.prepare("SELECT user_id FROM users WHERE user_name = :user_name");
     query.bindValue(":user_name", userName);
 
@@ -136,7 +136,7 @@ QUuid DatabaseController::checkUserCredentials(const QString& userName, const QS
         return QUuid{};
     }
 
-    QSqlQuery query;
+    QSqlQuery query(m_database);
     query.prepare("SELECT user_id FROM users WHERE user_name = :user_name AND password = :user_password");
     query.bindValue(":user_name", userName);
     query.bindValue(":user_password", password);
@@ -163,7 +163,7 @@ QList<QString> DatabaseController::getExistedFiles()
     QList<QString> files;
 
     // Execute a query to fetch the file names
-    QSqlQuery query;
+    QSqlQuery query(m_database);
     query.prepare("SELECT file_name FROM files");
 
     if (query.exec())
@@ -189,7 +189,7 @@ bool DatabaseController::removeFile(const QString& fileName, const QString& file
         return false;
     }
 
-    QSqlQuery query;
+    QSqlQuery query(m_database);
     query.prepare("DELETE FROM files WHERE file_name = :fileName AND file_path = :filePath");
     query.bindValue(":fileName", fileName);
     query.bindValue(":filePath", filePath);
@@ -211,7 +211,7 @@ bool DatabaseController::fileExist(const QString& fileName, const QString& fileP
         return false;
     }
 
-    QSqlQuery query;
+    QSqlQuery query(m_database);
     query.prepare("SELECT COUNT(*) FROM files WHERE file_name = :fileName AND file_path = :filePath");
     query.bindValue(":fileName", fileName);
     query.bindValue(":filePath", filePath);

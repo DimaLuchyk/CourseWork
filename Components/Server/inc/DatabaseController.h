@@ -45,7 +45,6 @@ private:
     QString m_userName;
     QString m_password;
     std::uint16_t m_port;
-
 };
 
 
