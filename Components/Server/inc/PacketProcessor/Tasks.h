@@ -27,21 +27,10 @@ namespace coursework::protocol
         DatabaseController* m_dbController;
     };
 
-    class TempTask : public ITask
+    class UnknownTask : ITask
     {
     public:
-        TempTask(DatabaseController* dbController)
-        :
-        ITask(dbController)
-        {
-
-        }
-
-        QByteArray perform() override
-        {
-            qDebug() << "TempTask";
-            return {};
-        }
+        QByteArray perform() override;
     };
 
     class LogUpTask : public ITask

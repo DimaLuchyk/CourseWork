@@ -38,28 +38,20 @@ QByteArray Serializer::combineToPacket(const PacketHeader& header, const Authori
     return packet;
 }
 
-Payload Serializer::toPayload(QByteArray& data)
+void Serializer::toPayload(QByteArray& data, PacketHeader& outHeader, Payload& outPayload)
 {
-    PacketHeader header;
-    Payload payload;
     QDataStream stream(&data, QIODevice::ReadOnly);
-    stream.readRawData(reinterpret_cast<char*>(&header), sizeof(PacketHeader));
-    stream >> payload.payload;
-
-    return payload;
+    stream.readRawData(reinterpret_cast<char*>(&outHeader), sizeof(PacketHeader));
+    stream >> outPayload.payload;
 }
 
-FilePaylaod Serializer::toFilePayload(QByteArray& data)
+void Serializer::toFilePayload(QByteArray& data, PacketHeader& outHeader, FilePaylaod& outPayload)
 {
-    PacketHeader header;
-    FilePaylaod payload;
     QDataStream stream(&data, QIODevice::ReadOnly);
-    stream.readRawData(reinterpret_cast<char*>(&header), sizeof(PacketHeader));
-    stream >> payload.clientUuid;
-    stream >> payload.fileName;
-    stream >> payload.fileData;
-
-    return payload;
+    stream.readRawData(reinterpret_cast<char*>(&outHeader), sizeof(PacketHeader));
+    stream >> outPayload.clientUuid;
+    stream >> outPayload.fileName;
+    stream >> outPayload.fileData;
 }
 
 void Serializer::toAuthorizationPayload(QByteArray& data, PacketHeader& outHeader, AuthorizationPayload& outPayload)
@@ -68,6 +60,4 @@ void Serializer::toAuthorizationPayload(QByteArray& data, PacketHeader& outHeade
     stream.readRawData(reinterpret_cast<char*>(&outHeader), sizeof(PacketHeader));
     stream >> outPayload.username;
     stream >> outPayload.password;
-
-    qDebug() << "username: " << outPayload.username << " password: " << outPayload.password;
 }

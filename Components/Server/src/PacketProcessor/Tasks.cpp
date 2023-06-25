@@ -15,6 +15,13 @@ coursework::protocol::ITask::ITask(DatabaseController *dbController)
 
 }
 
+QByteArray coursework::protocol::UnknownTask::perform()
+{
+    PLOG_DEBUG << "perform";
+
+    return {};
+}
+
 coursework::protocol::LogUpTask::LogUpTask(const QString& userName, const QString& password,
                                            DatabaseController *dbController)
     :

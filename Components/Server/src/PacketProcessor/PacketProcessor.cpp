@@ -53,18 +53,20 @@ QByteArray coursework::protocol::PacketProcessor::handlePacket(QByteArray& packe
     }
     else if(header->packetType == PacketType::ADD_FILE)
     {
-        FilePaylaod payload = Serializer::toFilePayload(packet);
-        qDebug() << "fileName:" << payload.fileName;
+        FilePaylaod payload;
+        Serializer::toFilePayload(packet, *header, payload);
         task = std::make_shared<AddFileTask>(payload.fileName, payload.fileData, QUuid(payload.clientUuid), m_dbController);
     }
     else if(header->packetType == PacketType::DOWNLOAD_FILE)
     {
-        Payload payload = Serializer::toPayload(packet);
+        Payload payload;
+        Serializer::toPayload(packet, *header, payload);
         task = std::make_shared<DownloadFileTask>(payload.payload, m_dbController);
     }
     else if(header->packetType == PacketType::REMOVE_FILE)
     {
-        Payload payload = Serializer::toPayload(packet);
+        Payload payload;
+        Serializer::toPayload(packet, *header, payload);
         task = std::make_shared<RemoveFileTask>(payload.payload, m_dbController);
     }
     else

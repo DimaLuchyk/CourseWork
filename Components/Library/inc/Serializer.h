@@ -16,9 +16,9 @@ namespace coursework::protocol
 
         static QByteArray combineToPacket(const PacketHeader& header, const AuthorizationPayload& payload);
 
-        static Payload toPayload(QByteArray& data);
+        static void toPayload(QByteArray& data, PacketHeader& outHeader, Payload& outPayload);
 
-        static FilePaylaod toFilePayload(QByteArray& data);
+        static void toFilePayload(QByteArray& data, PacketHeader& outHeader, FilePaylaod& outPayload);
 
         static void toAuthorizationPayload(QByteArray& data, PacketHeader& outHeader, AuthorizationPayload& outPayload);
 
