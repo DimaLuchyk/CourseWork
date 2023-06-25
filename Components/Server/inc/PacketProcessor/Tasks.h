@@ -27,9 +27,12 @@ namespace coursework::protocol
         DatabaseController* m_dbController;
     };
 
-    class UnknownTask : ITask
+    class UnknownTask : public ITask
     {
     public:
+        UnknownTask();
+        ~UnknownTask();
+
         QByteArray perform() override;
     };
 

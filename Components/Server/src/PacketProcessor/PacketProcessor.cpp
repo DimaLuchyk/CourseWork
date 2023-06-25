@@ -72,6 +72,7 @@ QByteArray coursework::protocol::PacketProcessor::handlePacket(QByteArray& packe
     else
     {
         PLOG_WARNING << "UNKNOWN PacketType received. PacketType: " << header->packetType;
+        task = std::make_shared<UnknownTask>();
     }
 
     return task->perform();

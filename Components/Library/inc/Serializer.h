@@ -3,8 +3,6 @@
 
 #include "Packet.h"
 
-#include <utility>
-
 namespace coursework::protocol
 {
     class Serializer
@@ -21,9 +19,6 @@ namespace coursework::protocol
         static void toFilePayload(QByteArray& data, PacketHeader& outHeader, FilePaylaod& outPayload);
 
         static void toAuthorizationPayload(QByteArray& data, PacketHeader& outHeader, AuthorizationPayload& outPayload);
-
-    private:
-        //static PacketHeader* m_header; //will be used for internal convertions
     };
 
 }

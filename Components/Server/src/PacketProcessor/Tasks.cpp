@@ -15,6 +15,18 @@ coursework::protocol::ITask::ITask(DatabaseController *dbController)
 
 }
 
+coursework::protocol::UnknownTask::UnknownTask()
+    :
+    ITask(nullptr)
+{
+    PLOG_DEBUG << "ctor";
+}
+
+coursework::protocol::UnknownTask::~UnknownTask()
+{
+    PLOG_DEBUG << "dtor";
+}
+
 QByteArray coursework::protocol::UnknownTask::perform()
 {
     PLOG_DEBUG << "perform";
