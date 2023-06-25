@@ -1,11 +1,8 @@
 #ifndef SERVER_CLIENT_H
 #define SERVER_CLIENT_H
 
-//#include <QObject>
 #include <QTcpSocket>
 #include <QByteArray>
-
-//#include "../../Server/inc/Shared.h"
 
 namespace coursework
 {
