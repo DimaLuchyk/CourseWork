@@ -71,7 +71,7 @@ namespace coursework::protocol
     };
 
 
-    /*class PacketGenerator
+    class PacketGenerator
     {
     public:
         static PacketHeader generatePacketHeader(const PacketType packetType, const std::uint32_t payloadLength)
@@ -109,6 +109,8 @@ namespace coursework::protocol
             stream << payload.username;
             stream << payload.password;
 
+            qDebug() << "username: " << payload.username << " password: " << payload.password;
+
             return packet;
         }
 
@@ -117,7 +119,7 @@ namespace coursework::protocol
         {
             return QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
         }
-    };*/
+    };
 
 }
 

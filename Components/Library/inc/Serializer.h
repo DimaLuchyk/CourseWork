@@ -3,10 +3,13 @@
 
 #include "Packet.h"
 
+#include <utility>
+
 namespace coursework::protocol
 {
     class Serializer
     {
+    public:
         static QByteArray combineToPacket(const PacketHeader& header, const Payload& payload);
 
         static QByteArray combineToPacket(const PacketHeader& header, const FilePaylaod& payload);
@@ -17,10 +20,10 @@ namespace coursework::protocol
 
         static FilePaylaod toFilePayload(QByteArray& data);
 
-        static AuthorizationPayload toAuthorizationPayload(QByteArray& data);
+        static std::pair<PacketHeader, AuthorizationPayload> toAuthorizationPayload(QByteArray& data);
 
     private:
-        static PacketHeader* m_header; //will be used for internal convertions
+        //static PacketHeader* m_header; //will be used for internal convertions
     };
 
 }

@@ -1,6 +1,7 @@
 #include "PacketProcessor/PacketProcessor.h"
 #include "PacketProcessor/Tasks.h"
-#include "Shared.h"
+#include "Packet.h"
+#include "Serializer.h"
 #include "plog/Log.h"
 
 #include <QDebug>
@@ -36,26 +37,13 @@ QByteArray coursework::protocol::PacketProcessor::handlePacket(QByteArray& packe
 
     if(header->packetType == PacketType::LOG_IN)
     {
-        AuthorizationPayload logInPayload;
-
-        QDataStream logInStream(&packet, QIODevice::ReadOnly);
-        logInStream.readRawData(reinterpret_cast<char*>(header), sizeof(PacketHeader));
-        logInStream >> logInPayload.username;
-        logInStream >> logInPayload.password;
-
-        task = std::make_shared<LogInTask>(logInPayload.username, logInPayload.password, m_dbController);
+        auto authorizationPacket = Serializer::toAuthorizationPayload(packet);
+        task = std::make_shared<LogInTask>(authorizationPacket.second.username, authorizationPacket.second.password, m_dbController);
     }
     else if(header->packetType == PacketType::LOG_UP)
     {
-        AuthorizationPayload payload;
-
-        QDataStream stream(&packet, QIODevice::ReadOnly);
-        stream.readRawData(reinterpret_cast<char*>(header), sizeof(PacketHeader));
-        stream >> payload.username;
-        stream >> payload.password;
-
-
-        task = std::make_shared<LogUpTask>(payload.username, payload.password, m_dbController);
+        auto authorizationPacket = Serializer::toAuthorizationPayload(packet);
+        task = std::make_shared<LogUpTask>(authorizationPacket.second.username, authorizationPacket.second.password, m_dbController);
     }
     else if(header->packetType == PacketType::GET_EXISTED_FILES)
     {
@@ -63,36 +51,18 @@ QByteArray coursework::protocol::PacketProcessor::handlePacket(QByteArray& packe
     }
     else if(header->packetType == PacketType::ADD_FILE)
     {
-        FilePaylaod payload;
-
-        QDataStream stream(&packet, QIODevice::ReadOnly);
-        stream.readRawData(reinterpret_cast<char*>(header), sizeof(PacketHeader));
-        stream >> payload.clientUuid;
-        stream >> payload.fileName;
-        stream >> payload.fileData;
-
+        FilePaylaod payload = Serializer::toFilePayload(packet);
+        qDebug() << "fileName:" << payload.fileName;
         task = std::make_shared<AddFileTask>(payload.fileName, payload.fileData, QUuid(payload.clientUuid), m_dbController);
     }
     else if(header->packetType == PacketType::DOWNLOAD_FILE)
     {
-        Payload payload;
-
-        QDataStream stream(&packet, QIODevice::ReadOnly);
-        stream.readRawData(reinterpret_cast<char*>(header), sizeof(PacketHeader));
-        stream >> payload.payload;
-
+        Payload payload = Serializer::toPayload(packet);
         task = std::make_shared<DownloadFileTask>(payload.payload, m_dbController);
     }
     else if(header->packetType == PacketType::REMOVE_FILE)
     {
-        Payload payload;
-
-        QDataStream stream(&packet, QIODevice::ReadOnly);
-        stream.readRawData(reinterpret_cast<char*>(header), sizeof(PacketHeader));
-        stream >> payload.payload;
-
-        qDebug() << "fileName: " << payload.payload;
-
+        Payload payload = Serializer::toPayload(packet);
         task = std::make_shared<RemoveFileTask>(payload.payload, m_dbController);
     }
     else

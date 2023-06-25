@@ -5,7 +5,6 @@
 #include "inc/AuthorizationWindow.h"
 #include "inc/MainWindow.h"
 #include "inc/NetworkClient.h"
-#include "PacketGenerator.h"
 
 #include <memory>
 
@@ -13,8 +12,6 @@
 int main(int argc, char *argv[]) {
 
     QApplication a(argc, argv);
-
-    test();
 
     auto client = std::make_shared<coursework::NetworkClient>();
     auto connectionWindow = std::make_unique<coursework::windows::ConnectionWindow>(client);

@@ -14,12 +14,15 @@ find_package(Qt5 COMPONENTS
 
 add_executable(Server main.cpp src/Server.cpp src/DatabaseController.cpp inc/DatabaseController.h inc/Shared.h inc/PacketProcessor/PacketProcessor.h src/PacketProcessor/PacketProcessor.cpp inc/PacketProcessor/Tasks.h src/PacketProcessor/Tasks.cpp inc/FileManager.h src/FileManager.cpp)
 
-include_directories(inc)
-include_directories(../../3rdparty/plog/include)
+include_directories(inc
+                    ../../3rdparty/plog/include
+                    ${PROJECT_SOURCE_DIR}/Components/Library/inc
+                    )
 
 target_link_libraries(Server
         Qt5::Core
         Qt5::Network
         Qt5::Sql
+        Library
         )
 
