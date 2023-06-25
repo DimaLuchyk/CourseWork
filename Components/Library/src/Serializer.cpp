@@ -1,7 +1,7 @@
 #include "Serializer.h"
 #include <QDataStream>
 
-#include <memory>
+#include <QDebug>
 
 using namespace coursework::protocol;
 
@@ -62,14 +62,12 @@ FilePaylaod Serializer::toFilePayload(QByteArray& data)
     return payload;
 }
 
-std::pair<PacketHeader, AuthorizationPayload> Serializer::toAuthorizationPayload(QByteArray& data)
+void Serializer::toAuthorizationPayload(QByteArray& data, PacketHeader& outHeader, AuthorizationPayload& outPayload)
 {
-    PacketHeader header;
-    AuthorizationPayload payload;
     QDataStream stream(&data, QIODevice::ReadOnly);
-    stream.readRawData(reinterpret_cast<char*>(&header), sizeof(PacketHeader));
-    stream >> payload.username;
-    stream >> payload.password;
+    stream.readRawData(reinterpret_cast<char*>(&outHeader), sizeof(PacketHeader));
+    stream >> outPayload.username;
+    stream >> outPayload.password;
 
-    return std::make_pair(header, payload);
+    qDebug() << "username: " << outPayload.username << " password: " << outPayload.password;
 }

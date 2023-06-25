@@ -20,7 +20,7 @@ namespace coursework::protocol
 
         static FilePaylaod toFilePayload(QByteArray& data);
 
-        static std::pair<PacketHeader, AuthorizationPayload> toAuthorizationPayload(QByteArray& data);
+        static void toAuthorizationPayload(QByteArray& data, PacketHeader& outHeader, AuthorizationPayload& outPayload);
 
     private:
         //static PacketHeader* m_header; //will be used for internal convertions

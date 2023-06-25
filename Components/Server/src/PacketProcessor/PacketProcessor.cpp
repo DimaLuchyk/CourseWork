@@ -37,13 +37,15 @@ QByteArray coursework::protocol::PacketProcessor::handlePacket(QByteArray& packe
 
     if(header->packetType == PacketType::LOG_IN)
     {
-        auto authorizationPacket = Serializer::toAuthorizationPayload(packet);
-        task = std::make_shared<LogInTask>(authorizationPacket.second.username, authorizationPacket.second.password, m_dbController);
+        AuthorizationPayload payload;
+        Serializer::toAuthorizationPayload(packet, *header, payload);
+        task = std::make_shared<LogInTask>(payload.username, payload.password, m_dbController);
     }
     else if(header->packetType == PacketType::LOG_UP)
     {
-        auto authorizationPacket = Serializer::toAuthorizationPayload(packet);
-        task = std::make_shared<LogUpTask>(authorizationPacket.second.username, authorizationPacket.second.password, m_dbController);
+        AuthorizationPayload payload;
+        Serializer::toAuthorizationPayload(packet, *header, payload);
+        task = std::make_shared<LogUpTask>(payload.username, payload.password, m_dbController);
     }
     else if(header->packetType == PacketType::GET_EXISTED_FILES)
     {
