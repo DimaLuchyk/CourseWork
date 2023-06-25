@@ -157,6 +157,6 @@ void coursework::windows::MainWindow::saveDownloadedFile(QByteArray fileData)
 void coursework::windows::MainWindow::addFileToList(const QString &filePath)
 {
     // Create a QListWidgetItem for the file
-    QListWidgetItem *item = new QListWidgetItem(QFileInfo(filePath).fileName());
+    auto item = new CustomItem(QFileInfo(filePath).fileName(), QFileInfo(filePath).size(), QFileInfo(filePath).fileName());
     m_fileListWidget->addItem(item);
 }

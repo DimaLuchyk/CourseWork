@@ -125,7 +125,6 @@ QByteArray coursework::protocol::GetExistedFilesTask::perform()
 
     const auto files = m_dbController->getExistedFiles();
 
-
     Payload payload;
     for (const auto& file : files)
     {

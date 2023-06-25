@@ -15,166 +15,22 @@ namespace coursework
     {
         Q_OBJECT
     public:
-        NetworkClient(QObject* parent = nullptr)
-            :
-        QObject(parent)
-        {
+        NetworkClient(QObject* parent = nullptr);
 
-        }
+        ~NetworkClient();
 
-        ~NetworkClient()
-        {
-            if(m_socket->isOpen())
-            {
-                m_socket->close();
-            }
-        }
+        QTcpSocket* get();
 
-        QTcpSocket* get()
-        {
-            return m_socket;
-        }
+        const QUuid& getId();
 
-        const QUuid& getId()
-        {
-            return m_uuid;
-        }
+        void setId(const QUuid& id);
 
-        void setId(const QUuid& id)
-        {
-            m_uuid = id;
-        }
+        bool connectToServer(const QString& ip, const std::uint16_t port);
 
-        bool connectToServer(const QString& ip, const std::uint16_t port)
-        {
-            m_port = port;
-            m_ip = ip;
-
-            m_socket = new QTcpSocket(this);
-            QObject::connect(m_socket, &QTcpSocket::readyRead, this, &NetworkClient::readTcpData);
-
-            m_socket->connectToHost(m_ip, m_port);
-            if(m_socket->waitForConnected())
-            {
-                qDebug() << "connected\n";
-                return true;
-            }
-            return false;
-        }
-
-        void sendData(const QByteArray &data) const
-        {
-            if(m_socket->isOpen())
-            {
-                qDebug() << "wrote: " << m_socket->write(data);
-                return;
-            }
-            else
-            {
-                qDebug() << "socket is not open!\n";
-            }
-        }
+        void sendData(const QByteArray &data);
 
     public slots:
-        QByteArray readTcpData()
-        {
-            if(m_socket->isOpen())
-            {
-                auto packet = m_socket->readAll();
-                coursework::protocol::PacketHeader *header = reinterpret_cast<coursework::protocol::PacketHeader *>(packet.data());
-
-                if (header->packetType == coursework::protocol::PacketType::LOG_IN_SUCCESS)
-                {
-                    coursework::protocol::Payload payload;
-
-                    QDataStream stream(&packet, QIODevice::ReadOnly);
-                    stream.readRawData(reinterpret_cast<char *>(header), sizeof(coursework::protocol::PacketHeader));
-                    stream >> payload.payload;
-
-                    setId(QUuid(payload.payload));
-
-                    emit loggedIn();
-                }
-                else if (header->packetType == coursework::protocol::PacketType::LOG_IN_FAILURE)
-                {
-                    coursework::protocol::Payload payload;
-
-                    QDataStream stream(&packet, QIODevice::ReadOnly);
-                    stream.readRawData(reinterpret_cast<char *>(header), sizeof(coursework::protocol::PacketHeader));
-                    stream >> payload.payload;
-
-                    emit failedToLogIn(payload.payload);
-                }
-                else if (header->packetType == coursework::protocol::PacketType::LOG_UP_SUCCESS)
-                {
-                    coursework::protocol::Payload payload;
-
-                    QDataStream stream(&packet, QIODevice::ReadOnly);
-                    stream.readRawData(reinterpret_cast<char *>(header), sizeof(coursework::protocol::PacketHeader));
-                    stream >> payload.payload;
-
-                    emit loggedUp(payload.payload);
-                }
-                else if (header->packetType == coursework::protocol::PacketType::LOG_UP_FAILURE)
-                {
-                    coursework::protocol::Payload payload;
-
-                    QDataStream stream(&packet, QIODevice::ReadOnly);
-                    stream.readRawData(reinterpret_cast<char *>(header), sizeof(coursework::protocol::PacketHeader));
-                    stream >> payload.payload;
-
-                    emit failedToLogUp(payload.payload);
-                }
-                else if (header->packetType == coursework::protocol::PacketType::GET_EXISTED_FILES_FAILURE)
-                {
-                    qDebug() << "GET_EXISTED_FILES_FAILURE";
-                }
-                else if (header->packetType == coursework::protocol::PacketType::GET_EXISTED_FILES_SUCCESS)
-                {
-                    coursework::protocol::Payload payload;
-
-                    QDataStream stream(&packet, QIODevice::ReadOnly);
-                    stream.readRawData(reinterpret_cast<char * >(header), sizeof(coursework::protocol::PacketHeader));
-                    stream >> payload.payload;
-
-                    emit receievedExistedFiles(payload.payload);
-                }
-                else if (header->packetType == coursework::protocol::PacketType::ADD_FILE_FAILURE)
-                {
-                    qDebug() << "ADD_FILE_FAILURE";
-                }
-                else if (header->packetType == coursework::protocol::PacketType::ADD_FILE_SUCCESS)
-                {
-                    QMessageBox::information(nullptr, "Info", "File was added successfully!");
-                }
-                else if (header->packetType == coursework::protocol::PacketType::DOWNLOAD_FILE_SUCCESS)
-                {
-                    coursework::protocol::FilePaylaod payload;
-
-                    QDataStream stream(&packet, QIODevice::ReadOnly);
-                    stream.readRawData(reinterpret_cast<char *>(header), sizeof(coursework::protocol::PacketHeader));
-                    stream >> payload.clientUuid;
-                    stream >> payload.fileName;
-                    stream >> payload.fileData;
-
-                    emit fileDownloaded(payload.fileData);
-
-                }
-                else if (header->packetType == coursework::protocol::PacketType::DOWNLOAD_FILE_FAILURE)
-                {
-                    qDebug() << "DOWNLOAD_FILE_FAILURE";
-                }
-                else if (header->packetType == coursework::protocol::PacketType::REMOVE_FILE_SUCCESS)
-                {
-                    qDebug() << "REMOVE_FILE_SUCCESS";
-                }
-                else if (header->packetType == coursework::protocol::PacketType::REMOVE_FILE_FAILURE)
-                {
-                    qDebug() << "REMOVE_FILE_FAILURE";
-                }
-                return packet;
-            }
-        }
+        QByteArray readTcpData();
 
     signals:
         void loggedIn();
