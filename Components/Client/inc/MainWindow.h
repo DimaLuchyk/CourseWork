@@ -15,7 +15,6 @@
 
 #include <memory>
 
-#include "Client.h"
 #include "NetworkClient.h"
 
 namespace coursework::windows

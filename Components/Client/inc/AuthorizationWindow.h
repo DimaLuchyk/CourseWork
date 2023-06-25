@@ -6,7 +6,6 @@
 #include <QPushButton>
 #include <QLabel>
 
-#include "Client.h"
 #include "NetworkClient.h"
 
 namespace coursework::windows
