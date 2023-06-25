@@ -1,5 +1,7 @@
 #include "AuthorizationWindow.h"
-#include "../../Server/inc/Shared.h"
+#include "Packet.h"
+#include "PacketGenerator.h"
+#include "Serializer.h"
 #include "NetworkClient.h"
 
 #include <QLabel>
@@ -56,7 +58,7 @@ void coursework::windows::AuthorizationWindow::onLogInClicked()
     auto header = coursework::protocol::PacketGenerator::generatePacketHeader(coursework::protocol::PacketType::LOG_IN,
                                                                               sizeof(payload));
 
-    m_client->sendData(coursework::protocol::PacketGenerator::combineToPacket(header, payload));
+    m_client->sendData(coursework::protocol::Serializer::combineToPacket(header, payload));
 }
 
 void coursework::windows::AuthorizationWindow::onLogUpClicked()
@@ -74,5 +76,5 @@ void coursework::windows::AuthorizationWindow::onLogUpClicked()
     auto header = coursework::protocol::PacketGenerator::generatePacketHeader(coursework::protocol::PacketType::LOG_UP,
                                                                               sizeof(payload));
 
-    m_client->sendData(coursework::protocol::PacketGenerator::combineToPacket(header, payload));
+    m_client->sendData(coursework::protocol::Serializer::combineToPacket(header, payload));
 }

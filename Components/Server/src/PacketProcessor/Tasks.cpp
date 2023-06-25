@@ -1,5 +1,7 @@
 #include "PacketProcessor/Tasks.h"
-#include "Shared.h"
+#include "Packet.h"
+#include "PacketGenerator.h"
+#include "Serializer.h"
 #include "plog/Log.h"
 #include "FileManager.h"
 
@@ -58,7 +60,7 @@ QByteArray coursework::protocol::LogUpTask::perform()
         Payload payload{"The user is already registered"};
         PacketHeader header = PacketGenerator::generatePacketHeader(PacketType::LOG_UP_FAILURE, sizeof(payload));
 
-        return PacketGenerator::combineToPacket(header, payload);
+        return Serializer::combineToPacket(header, payload);
     }
 
     QUuid uuid = QUuid::createUuid();
@@ -67,7 +69,7 @@ QByteArray coursework::protocol::LogUpTask::perform()
     Payload payload{"User registered"};
     PacketHeader header = PacketGenerator::generatePacketHeader(PacketType::LOG_UP_SUCCESS, sizeof(payload));
 
-    return PacketGenerator::combineToPacket(header, payload);
+    return Serializer::combineToPacket(header, payload);
 }
 
 coursework::protocol::LogInTask::LogInTask(const QString &userName, const QString &password, DatabaseController *dbController)
@@ -95,13 +97,13 @@ QByteArray coursework::protocol::LogInTask::perform()
         Payload payload{clientUuid.toString()};
         PacketHeader header = PacketGenerator::generatePacketHeader(PacketType::LOG_IN_SUCCESS, sizeof(payload));
 
-        return PacketGenerator::combineToPacket(header, payload);
+        return Serializer::combineToPacket(header, payload);
     }
 
     Payload payload{"You should register first. Or wrong credentials."};
     PacketHeader header = PacketGenerator::generatePacketHeader(PacketType::LOG_IN_FAILURE, sizeof(payload));
 
-    return PacketGenerator::combineToPacket(header, payload);
+    return Serializer::combineToPacket(header, payload);
 }
 
 
@@ -132,7 +134,7 @@ QByteArray coursework::protocol::GetExistedFilesTask::perform()
 
     auto header = PacketGenerator::generatePacketHeader(PacketType::GET_EXISTED_FILES_SUCCESS, sizeof(payload));
 
-    return PacketGenerator::combineToPacket(header, payload);
+    return Serializer::combineToPacket(header, payload);
 }
 
 coursework::protocol::AddFileTask::AddFileTask(const QString& fileName, const QByteArray& fileData, const QUuid& userId, DatabaseController* dbController)
@@ -164,14 +166,14 @@ QByteArray coursework::protocol::AddFileTask::perform()
         Payload payload{m_fileName + "was added to the server"};
         auto header = coursework::protocol::PacketGenerator::generatePacketHeader(PacketType::ADD_FILE_SUCCESS, sizeof(payload));
 
-        return coursework::protocol::PacketGenerator::combineToPacket(header, payload);
+        return coursework::protocol::Serializer::combineToPacket(header, payload);
     }
 
     PLOG_WARNING << m_fileName << " file, was not added to the server";
     Payload payload{m_fileName + "failed to add to the server"};
     auto header = coursework::protocol::PacketGenerator::generatePacketHeader(PacketType::ADD_FILE_FAILURE, sizeof(payload));
 
-    return coursework::protocol::PacketGenerator::combineToPacket(header, payload);
+    return coursework::protocol::Serializer::combineToPacket(header, payload);
 }
 
 coursework::protocol::DownloadFileTask::DownloadFileTask(const QString& fileName, DatabaseController* dbController)
@@ -214,13 +216,13 @@ QByteArray coursework::protocol::DownloadFileTask::perform()
         payload.fileData = file.readAll();
         auto header = coursework::protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::DOWNLOAD_FILE_SUCCESS, sizeof(payload));
 
-        return coursework::protocol::PacketGenerator::combineToPacket(header, payload);
+        return coursework::protocol::Serializer::combineToPacket(header, payload);
 
     } while (false);
 
 
     header = coursework::protocol::PacketGenerator::generatePacketHeader(PacketType::DOWNLOAD_FILE_FAILURE, sizeof(payload));
-    return coursework::protocol::PacketGenerator::combineToPacket(header, payload);
+    return coursework::protocol::Serializer::combineToPacket(header, payload);
 }
 
 coursework::protocol::RemoveFileTask::RemoveFileTask(const QString& fileName, DatabaseController* dbContorller)
@@ -264,11 +266,11 @@ QByteArray coursework::protocol::RemoveFileTask::perform()
         }
 
         header = coursework::protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::REMOVE_FILE_SUCCESS, sizeof(payload));
-        return coursework::protocol::PacketGenerator::combineToPacket(header, payload);
+        return coursework::protocol::Serializer::combineToPacket(header, payload);
     }
     while(false);
 
     header = coursework::protocol::PacketGenerator::generatePacketHeader(PacketType::REMOVE_FILE_FAILURE, sizeof(payload));
-    return coursework::protocol::PacketGenerator::combineToPacket(header, payload);
+    return coursework::protocol::Serializer::combineToPacket(header, payload);
 }
 

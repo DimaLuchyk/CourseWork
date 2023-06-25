@@ -1,5 +1,5 @@
 #include "Server.h"
-#include "Shared.h"
+#include "Packet.h"
 
 #include <plog/Log.h>
 

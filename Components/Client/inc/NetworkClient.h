@@ -5,9 +5,9 @@
 #include <QTcpSocket>
 #include <QUuid>
 #include <QFile>
+#include <QMessageBox>
 
-
-#include "../../Server/inc/Shared.h"
+#include "Packet.h"
 
 namespace coursework
 {
@@ -145,7 +145,7 @@ namespace coursework
                 }
                 else if (header->packetType == coursework::protocol::PacketType::ADD_FILE_SUCCESS)
                 {
-                    qDebug() << "ADD_FILE_SUCCESS";
+                    QMessageBox::information(nullptr, "Info", "File was added successfully!");
                 }
                 else if (header->packetType == coursework::protocol::PacketType::DOWNLOAD_FILE_SUCCESS)
                 {

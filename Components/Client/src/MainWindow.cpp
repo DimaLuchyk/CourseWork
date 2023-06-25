@@ -1,5 +1,9 @@
 #include "MainWindow.h"
 
+#include "Packet.h"
+#include "PacketGenerator.h"
+#include "Serializer.h"
+
 coursework::windows::MainWindow::MainWindow(std::shared_ptr<NetworkClient> client, QWidget *parent)
     :
     QWidget(parent),
@@ -53,7 +57,7 @@ void coursework::windows::MainWindow::downloadFileRequest()
         coursework::protocol::Payload payload{selectedFile};
         auto header = coursework::protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::DOWNLOAD_FILE, sizeof(payload));
 
-        m_client->sendData(coursework::protocol::PacketGenerator::combineToPacket(header, payload));
+        m_client->sendData(coursework::protocol::Serializer::combineToPacket(header, payload));
     }
 }
 
@@ -80,7 +84,7 @@ void coursework::windows::MainWindow::uploadFileRequest()
         payload.fileData = file.readAll();
 
         auto header = coursework::protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::ADD_FILE, sizeof(payload));
-        m_client->sendData(coursework::protocol::PacketGenerator::combineToPacket(header, payload));
+        m_client->sendData(coursework::protocol::Serializer::combineToPacket(header, payload));
     }
 }
 
@@ -89,7 +93,7 @@ void coursework::windows::MainWindow::updateFilesRequest()
     protocol::Payload payload;
     auto header = protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::GET_EXISTED_FILES, sizeof(payload));
 
-    m_client->sendData(protocol::PacketGenerator::combineToPacket(header, payload));
+    m_client->sendData(protocol::Serializer::combineToPacket(header, payload));
 }
 
 void coursework::windows::MainWindow::deleteFileRequest()
@@ -105,7 +109,7 @@ void coursework::windows::MainWindow::deleteFileRequest()
         coursework::protocol::Payload payload{selectedFile};
         auto header = coursework::protocol::PacketGenerator::generatePacketHeader(protocol::PacketType::REMOVE_FILE, sizeof(payload));
 
-        m_client->sendData(coursework::protocol::PacketGenerator::combineToPacket(header, payload));
+        m_client->sendData(coursework::protocol::Serializer::combineToPacket(header, payload));
     }
 }
 
