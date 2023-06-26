@@ -108,7 +108,7 @@ namespace coursework::windows
         void saveDownloadedFile(QByteArray fileData);
 
     private:
-        void addFileToList(const QString &filePath);
+        void addFileToList(const QString &fileName, const QString &date);
 
     private:
         QList<QString> m_files;

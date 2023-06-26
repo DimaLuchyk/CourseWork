@@ -116,27 +116,29 @@ void coursework::windows::MainWindow::deleteFileRequest()
 void coursework::windows::MainWindow::updateFiles(const QString& files)
 {
     qDebug() << "updateFiles" << files;
-    QStringList fileNames;
+    QList<QPair<QString, QString>> filesInfo;
 
-    // Parse the packet to extract individual file names
-    QString delimiter = "|"; // Delimiter used to separate file names
-    int startIndex = 0;
-    int delimiterIndex = files.indexOf(delimiter, startIndex);
+    // Split the input string into lines
+    QStringList lines = files.split('\n', Qt::SkipEmptyParts);
 
-    while (delimiterIndex != -1)
+    const QChar delimiter = '|'; // Delimiter used to separate file names
+    // Iterate over the lines and split each line into filename and data
+    for (const auto& line : lines)
     {
-        QString fileName = files.mid(startIndex, delimiterIndex - startIndex);
-        fileNames.append(fileName);
-
-        startIndex = delimiterIndex + delimiter.size();
-        delimiterIndex = files.indexOf(delimiter, startIndex);
+        QStringList parts = line.split(delimiter);
+        if (parts.size() == 2)
+        {
+            QString fileName = parts[0];
+            QString date = parts[1];
+            filesInfo.append(QPair<QString, QString>(fileName, date));
+        }
     }
 
     m_fileListWidget->clear();
 
-    for(const auto& file : fileNames)
+    for(const auto& fileInfo : filesInfo)
     {
-        addFileToList(file);
+        addFileToList(fileInfo.first, fileInfo.second);
     }
 }
 
@@ -154,9 +156,8 @@ void coursework::windows::MainWindow::saveDownloadedFile(QByteArray fileData)
     }
 }
 
-void coursework::windows::MainWindow::addFileToList(const QString &filePath)
+void coursework::windows::MainWindow::addFileToList(const QString &fileName, const QString &date)
 {
-    // Create a QListWidgetItem for the file
-    auto item = new CustomItem(QFileInfo(filePath).fileName(), QFileInfo(filePath).size(), QFileInfo(filePath).fileName());
+    auto item = new CustomItem(fileName, 0, date);
     m_fileListWidget->addItem(item);
 }

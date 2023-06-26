@@ -1,5 +1,7 @@
 #include <QDebug>
 
+#include <utility>
+
 #include "DatabaseController.h"
 #include "plog/Log.h"
 
@@ -152,7 +154,7 @@ QUuid DatabaseController::checkUserCredentials(const QString& userName, const QS
     return QUuid();
 }
 
-QList<QString> DatabaseController::getExistedFiles()
+QList<QPair<QString, QString>> DatabaseController::getExistedFiles()
 {
     if(!m_database.isOpen())
     {
@@ -160,17 +162,20 @@ QList<QString> DatabaseController::getExistedFiles()
         return {};
     }
 
-    QList<QString> files;
+    QList<QPair<QString, QString>> files;
 
     // Execute a query to fetch the file names
     QSqlQuery query(m_database);
-    query.prepare("SELECT file_name FROM files");
+    query.prepare("SELECT file_name, upload_date FROM files");
 
     if (query.exec())
     {
         while (query.next())
         {
-            files.append(query.value("file_name").toString());
+            QString fileName = query.value(0).toString();
+            QString uploadData = query.value(1).toString();
+
+            files.append(QPair(fileName, uploadData));
         }
         return files;
     }

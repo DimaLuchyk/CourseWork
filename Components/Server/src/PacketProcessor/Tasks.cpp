@@ -126,9 +126,9 @@ QByteArray coursework::protocol::GetExistedFilesTask::perform()
     const auto files = m_dbController->getExistedFiles();
 
     Payload payload;
-    for (const auto& file : files)
+    for (const auto& pair : files)
     {
-        payload.payload += file + "|"; // use '|' as a delimeter
+        payload.payload += pair.first + "|" + pair.second + "\n"; // use '|' as a delimeter
     }
 
     auto header = PacketGenerator::generatePacketHeader(PacketType::GET_EXISTED_FILES_SUCCESS, sizeof(payload));
